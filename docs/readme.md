@@ -16,7 +16,7 @@ QuyenPT3
 
 ### 1.2 Run mutiple slaves
 
-- Number of slaves is configed in `congif.yaml`
+- Number of slaves is configed in `config.yaml`
 - Each slave run in one seperate goroutines
 - Each slace has one seperate `stub`. Each `stub` has one ClientConn to connect to server
 
