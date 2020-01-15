@@ -256,11 +256,31 @@ func (slave Slave) invoke(call string , proto string, data string) (proto.Messag
 - Run multiple slaves, each slave has multiple connections
 - Store benchmark results in influxdb
 
-### 2.1 Generate random data with given proto
+### 2.1 Generate random data with given proto  
+
+Up to now, the system supports generating data for following types:  
+- string
+- int32
+- int64
+- sint32
+- sint64
+- fixed32
+- fixed64
+- sfixed32
+- sfixed64
+- float
+- bool
+- bytes
+- map
+- repeated
+- enum
+- oneof
+
+The data is just random. Feature works: generate sequential data.  
 
 ### 2.2 Start, stop, and get results from locust in run time
 
-- **START LOCUST** by call api
+- **START LOCUST** by calling api  
 
 ```bash
 curl --location --request POST 'http://localhost:7000/swarm' \
@@ -269,7 +289,7 @@ curl --location --request POST 'http://localhost:7000/swarm' \
 --data-raw 'locust_count=1000&hatch_rate=100'
 ```
 
-- **STOP LOCUST** by call api
+- **STOP LOCUST** by calling api  
 
 ```bash
 curl --location --request GET 'http://localhost:7000/stop' \
@@ -277,7 +297,7 @@ curl --location --request GET 'http://localhost:7000/stop' \
 --header 'Accept: */*' \
 ```
 
-- **GET BENCHMARK RESULTS** by call api
+- **GET BENCHMARK RESULTS** by calling api
 
 ```bash
 curl --location --request GET 'http://localhost:7000/stats/distribution/csv' \
@@ -287,7 +307,7 @@ curl --location --request GET 'http://localhost:7000/stats/distribution/csv' \
 curl --location --request GET 'http://localhost:7000/stats/requests/csv' \
 ```
 
-### 2.3 Store result in influxdb
+### 2.3 Store results in influxdb
 
 - Tags:
   - `id` : each benchmark test has a unique ID
