@@ -2,7 +2,7 @@
 
 ## 1. Demo 1
 
-### 1.0 Delevirable
+### 1.0 Deliverable
 
 - Parse proto
 - Use default data to benchmark
@@ -174,7 +174,7 @@ func (slave Slave) invoke(call string , proto string, data string) (proto.Messag
 
 ## 2. Demo 2
 
-### 2.0 Delevirable
+### 2.0 Deliverable
 
 - Generate random data with given proto
 - Use random data to benchmark
