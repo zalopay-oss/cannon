@@ -1,14 +1,10 @@
 package utils
 
 import (
-	"bytes"
-	"encoding/csv"
 	"fmt"
 	"github.com/sirupsen/logrus"
 	"github.com/tranndc/benchmark/configs"
-	"io"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -73,27 +69,46 @@ func CloseLocust(config *configs.ServiceConfig) error{
 }
 
 
-func ParseMessage(body []byte) map[string]string {
-	reader := csv.NewReader(bytes.NewReader(body))
-	var data = make([][]string,0,3)
-	for {
-		line, error := reader.Read()
-		if error == io.EOF {
-			break
-		} else if error != nil {
-			log.Fatal(error)
-		}
-		data = append(data, line)
+
+func GetDistributedFile(config *configs.ServiceConfig) (map[string]string, error) {
+	des := config.Locust+"/stats/distribution/csv"
+	req, err := http.NewRequest("GET",des,nil)
+	if err!=nil{
+		return nil, err
 	}
-	return parseKV(data[0],data[1])
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		panic(err)
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err!=nil{
+		return nil,err
+	}
+	return parseMessage(body),nil
 }
 
-func parseKV(key []string, value []string)map[string]string{
-	size:= len(key)
-	res := make(map[string]string)
-	for i:=0;i<size;i++{
-		res[key[i]] = value[i]
-	}
-	return res
-}
 
+func GetRequestsFile(config *configs.ServiceConfig) (map[string]string, error) {
+	des := config.Locust + "/stats/requests/csv"
+	req, err := http.NewRequest("GET", des, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		panic(err)
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	return parseMessage(body), nil
+}
