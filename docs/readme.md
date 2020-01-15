@@ -2,7 +2,7 @@
 
 ## 1. Demo 1
 
-### 1.0 Delevirable
+### 1.0 Deliverable
 
 - Parse proto
 - Use default data to benchmark
@@ -245,3 +245,67 @@ func (slave Slave) invoke(call string , proto string, data string) (proto.Messag
     return res,nil
 }
 ```
+
+## 2. Demo 2
+
+### 2.0 Deliverable
+
+- Generate random data with given proto
+- Use random data to benchmark
+- Start Locust in run time
+- Run multiple slaves, each slave has multiple connections
+- Store benchmark results in influxdb
+
+### 2.1 Generate random data with given proto
+
+### 2.2 Start, stop, and get results from locust in run time
+
+- **START LOCUST** by call api
+
+```bash
+curl --location --request POST 'http://localhost:7000/swarm' \
+--header 'Connection: keep-alive' \
+--header 'Accept: */*' \
+--data-raw 'locust_count=1000&hatch_rate=100'
+```
+
+- **STOP LOCUST** by call api
+
+```bash
+curl --location --request GET 'http://localhost:7000/stop' \
+--header 'Connection: keep-alive' \
+--header 'Accept: */*' \
+```
+
+- **GET BENCHMARK RESULTS** by call api
+
+```bash
+curl --location --request GET 'http://localhost:7000/stats/distribution/csv' \
+```
+
+```bash
+curl --location --request GET 'http://localhost:7000/stats/requests/csv' \
+```
+
+### 2.3 Store result in influxdb
+
+- Tags:
+  - `id` : each benchmark test has a unique ID
+- Fields:
+  - `p90`
+  - `p95`
+  - `p99`
+  - `rps`: Request/second
+  - `requests`: Number of requests
+  - `max_res_time`: Maximum response time
+  - `min_res_time`: Minimum response time
+  - `median_res_time`: Median response time
+  - `avg_res_time`: Average response time
+  - `avg_res_size`: Average content size
+  - `configs`: JSON
+    - `service`: service's name
+    - `proto`: link to proto
+    - `hatch_rate`
+    - `users`: number of users
+    - `slaves`: number of slaves
+  
