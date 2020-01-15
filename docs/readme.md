@@ -12,13 +12,87 @@
 
 ### 1.1 Parse proto and apply default data in order to make input
 
-QuyenPT3
+- Checkout this library: [protoreflect](https://github.com/jhump/protoreflect)
+- First, we need to get the file descriptor of proto file. 
+- From file descriptor, we can also get a service descriptor due to a service call provided by user.  
+- After getting service descriptor, we can get method descriptor which contains information about gRPC service call, Input/Output type for that call.  
+
+```go
+md, err, fileDesc := parser.GetMethodDescFromProto("service.KeyValueStoreService.GetKV", "./zpkv.proto", []string{})
+```  
+
+In order to Invoke gRPC service call, we have define Input type for that call under `proto.Message` type. Therefore, I implement a method that generate the `dynamic.Message` input from method descriptor gotten from the above step:  
+
+```go
+func messageFromMap(input *dynamic.Message, data *map[string]interface{}) error {
+	strData, err := json.Marshal(data)
+	if err != nil {
+		return err
+	}
+
+	err = jsonpb.UnmarshalString(string(strData), input)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+
+func createPayloadsFromJSON(data string, mtd *desc.MethodDescriptor) ([]*dynamic.Message, error) {
+	md := mtd.GetInputType()
+	var inputs []*dynamic.Message
+
+	if len(data) > 0 {
+		if strings.IndexRune(data, '[') == 0 {
+			dataArray := make([]map[string]interface{}, 5)
+			err := json.Unmarshal([]byte(data), &dataArray)
+			if err != nil {
+				return nil, fmt.Errorf("Error unmarshalling payload. Data: '%v' Error: %v", data, err.Error())
+			}
+
+			elems := len(dataArray)
+			if elems > 0 {
+				inputs = make([]*dynamic.Message, elems)
+			}
+
+			for i, elem := range dataArray {
+				elemMsg := dynamic.NewMessage(md)
+				err := messageFromMap(elemMsg, &elem)
+				if err != nil {
+					return nil, fmt.Errorf("Error creating message: %v", err.Error())
+				}
+
+				inputs[i] = elemMsg
+			}
+		} else {
+			inputs = make([]*dynamic.Message, 1)
+			inputs[0] = dynamic.NewMessage(md)
+			err := jsonpb.UnmarshalString(data, inputs[0])
+			if err != nil {
+				return nil, fmt.Errorf("Error creating message from data. Data: '%v' Error: %v", data, err.Error())
+			}
+		}
+	}
+
+	return inputs, nil
+}
+
+func main() {
+    inputs, _ := createPayloadsFromJSON(jsonStr, md)
+	err = jsonpb.UnmarshalString(jsonStr, inputs[0])
+    checkError(err)
+    res, err := stub.InvokeRpc(ctx, md, inputs[0])
+	checkError(err)
+	logrus.Info(res)
+}
+```
 
 ### 1.2 Run mutiple slaves
 
 - Number of slaves is configed in `config.yaml`
 - Each slave run in one seperate goroutines
-- Each slace has one seperate `stub`. Each `stub` has one ClientConn to connect to server
+- Each slave has one seperate `stub`. Each `stub` has one ClientConn to connect to server
 
 ```go
     type Slave struct{
