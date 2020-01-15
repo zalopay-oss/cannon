@@ -1,0 +1,24 @@
+
+Locust: "http://0.0.0.0:7000/"
+NoConns: 1
+NoWorkers: 80
+HatchRate: 10
+
+Bucket: "benchmark-results"
+Origin: "tranndc"
+DatabaseAddr: "http://0.0.0.0:9999"
+Token: "e_jl06gwSsAmwStymP1hrSp3_-l8s56QFT9jzklJ_B_uTwu6L4h1BtjFRoYk3LgsDGKl562X8msWwbaQN5llQg=="
+#Token: "JDk7FMr0A1gjWw3D71meV3yM2T1f4I_YLmkWP9MvkgtyYzy8SAKKAQXg6omw9s_RJTTZY-_QnmvEaEAQVzpBIg=="
+#Token: "ueE5pnjUaXkb64KGyj5yhluTsDNdNaIyoRlh7lWiVFcLauoQd8ORRLXYVsP9lsine6Lp8qt9vtbmltTcTLnNnw=="
+
+#GRPCPort: 4770
+GRPCPort: 1234
+GRPCHost: "localhost"
+
+Service: "service.KeyValueStoreService.Connect"
+Proto: "./zpkv.proto"
+Data: "{\"type\":1}"
+
+#Service: "service.PingService.ping"
+#Proto: "./ping.proto"
+#Data: "{\"timestamp\":1}"
