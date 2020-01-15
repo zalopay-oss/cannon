@@ -276,6 +276,67 @@ Up to now, the system supports generating data for following types:
 - enum
 - oneof
 
+For example:  
+```proto  
+message Status {
+    //code = 1 means success
+    int32 code = 1;
+    string error = 2;
+}
+
+enum StoreType {
+    BTreeDisk = 0;
+    BPlusTreeDisk = 1;
+}
+
+message FakeRequest {
+    Status status = 1;
+    StoreType type = 2;
+    int32 number = 3;
+    string sentence = 4;
+    repeated Status cmdList = 5;
+    map<string, InnerMap> conn = 6;
+    bytes encodedData = 7;
+}
+```  
+
+Generated data for FakeRequest message would be:  
+
+```json
+{ 
+    "cmdList":[ 
+        { 
+            "code":38,
+            "error":"hGukAnmDAlpphpYPxOWQgluCypbcno"
+        }
+    ],
+    "conn":{ 
+        "KVUgnaREiRMXbComoWmKPFvAiqQajD":{ 
+            "innerMap":{ 
+                "EBtEYStxIHbpjHaosLKvsBMsqanAJy":"lNHjcqwHdFXqQDxIvBAcPAUfRynrMs",
+                "FDkPFNYLiLFZPjlCDlzjzHqGwgVnCV":"xTmdfQyeDOPfbzhHaTsWorhBCMhSfl",
+                "KdwAcRBEplGONbsDJsYNehiNCZIYHQ":"EhIJQulJSRSybiuhmmYoePLahZfJdd",
+                "eZTDOUYhsFsgvbIkKrTyYiifwbCNlh":"SEYqevPYdwTsxTWgRMWYFwONGVbSYl"
+            }
+        },
+        "wCoFTcervqxhCoMdHqrOdHaTCAKgeA":{ 
+            "innerMap":{ 
+                "hNjDXxYQOgwrOuCRcdkccbACXktupx":"sAikHvlnxIVduzwOpddrkvSItYFHQQ"
+            }
+        }
+    },
+    "encodedData":"clpQbHpNUG9kTlBnVHF3amJ1UG5jWkF5ZUZLRlVx",
+    "number":51,
+    "sentence":"FuEBJcSZxNHvLZuAShCEGbDCtzveEX",
+    "status":{ 
+        "code":50,
+        "error":"FKmWRgzjCkXnOdewvXUubvfMaMTVpM"
+    },
+    "type":1
+}
+
+```
+
 The data is just random. Feature works: generate sequential data.  
 
 ### 2.2 Start, stop, and get results from locust in run time
