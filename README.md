@@ -40,7 +40,7 @@ LocustController -> Database: save metrics
 
 ## Planning
 
-### Sprint 1 (Week 1,2)
+### Sprint 1 (v0.1.1)
 
 Overview:
 
@@ -55,6 +55,8 @@ Deliveriable:
 
 - Source code
 - Documentations: sequence diagram , usecase, internal service, technical stack.
+
+[Detail](src/README.md)
 
 ### Sprint 2
 

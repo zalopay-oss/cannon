@@ -1,1 +1,0 @@
-go build ./cmd/benchmark && ./benchmark
