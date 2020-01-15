@@ -20,6 +20,7 @@ func RunTask(slave *Slave, config *configs.ServiceConfig, done chan bool){
 		Fn: slave.Invoke,
 	}
 
+
 	boomer.Events.Subscribe("boomer:hatch", func(workers int, hatchRate float64) {
 		logrus.Info("The master asks me to spawn ", workers, " goroutines with a hatch rate of", int(hatchRate), "per second.")
 	})
@@ -55,14 +56,14 @@ func (slave Slave) invoke(call string , proto string) (proto.Message, error){
 
 	stub, err := slave.Pool.Get()
 	if err != nil {
-		logrus.Error("Error getting stub: %+v", err.Error())
+		logrus.Error("Error getting stub: %v", err.Error())
 		return nil, err
 	}
 	res, err := stub.InvokeRpc(ctx, md, inputs[0])
 	elapsed := boomer.Now() - start
 
 	if err != nil {
-		logrus.Error("Error InvokeRpc: %+v", err.Error())
+		logrus.Error("Error InvokeRpc: %v", err.Error())
 		boomer.RecordFailure("tcp", call+" fail", elapsed, err.Error())
 		return nil, err
 	} else {
