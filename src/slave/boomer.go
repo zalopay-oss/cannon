@@ -3,71 +3,114 @@ package slave
 import (
 	"context"
 	"github.com/golang/protobuf/proto"
+	"github.com/jhump/protoreflect/desc"
 	"github.com/myzhan/boomer"
 	"github.com/sirupsen/logrus"
-	"github.com/tranndc/benchmark/configs"
 	"github.com/tranndc/benchmark/generator"
+	"github.com/tranndc/benchmark/generator/parser"
+	"os"
+	"os/signal"
+	"sync"
+	"sync/atomic"
+	"syscall"
+	"time"
 )
 
+var startTest int32 = 0
 
+var slaveBoomer *boomer.Boomer
+var md *desc.MethodDescriptor
+var fd *desc.FileDescriptor
 
-func RunTask(slave *Slave, config *configs.ServiceConfig, done chan bool){
-	var count = make(chan bool)
+func waitForQuit() {
+	wg := sync.WaitGroup{}
+	wg.Add(1)
+
+	quitByMe := false
+	go func() {
+		c := make(chan os.Signal)
+		signal.Notify(c, syscall.SIGINT, syscall.SIGTERM)
+		<-c
+		quitByMe = true
+		slaveBoomer.Quit()
+		wg.Done()
+	}()
+
+	_ = boomer.Events.Subscribe("boomer:quit", func() {
+		if !quitByMe {
+			wg.Done()
+		}
+		logrus.Info("STOP SLAVE")
+	})
+
+	wg.Wait()
+}
+
+func (slave *Slave) RunTask() {
+	slaveBoomer = boomer.NewBoomer(slave.config.LocustHost,slave.config.LocustPort)
+	var err error
+	md, err, fd = parser.GetMethodDescFromProto(slave.config.Method,slave.config.Proto,[]string{})
+
+	if err!=nil{
+		panic(err)
+		os.Exit(1)
+	}
 
 	task:= &boomer.Task{
-		Name:	config.Service,
+		Name:	slave.config.Method,
 		Weight: 1,
 		Fn: slave.Invoke,
 	}
 
-
 	boomer.Events.Subscribe("boomer:hatch", func(workers int, hatchRate float64) {
-		logrus.Info("The master asks me to spawn ", workers, " goroutines with a hatch rate of", int(hatchRate), "per second.")
-	})
-
-	boomer.Events.Subscribe("boomer:quit", func() {
-		logrus.Info("Boomer is quitting now.")
+		err := slave.CreateStubPool(workers)
+		if err!=nil{
+			panic(err)
+			os.Exit(1)
+		}
+		atomic.AddInt32(&startTest,1)
+		logrus.Info("The master asks me to spawn ", workers, " goroutines with a hatch rate of ", int(hatchRate), " per second.")
 	})
 
 	logrus.Info("START SLAVE")
-	boomer.Run(task)
+	slaveBoomer.Run(task)
+	waitForQuit()
 
-	done <- true
-	count <- true
 }
 
-func (slave Slave) Invoke() {
-	_, err := slave.invoke(slave.config.Service, slave.config.Proto)
+func (slave *Slave) Invoke() {
+	_, err := slave.invoke()
 	if err!=nil{
 		logrus.Fatal(err)
 	}
 }
 
-
-func (slave Slave) invoke(call string , proto string) (proto.Message, error){
+func (slave *Slave) invoke() (proto.Message, error){
+	for startTest==0{
+	}
 	ctx := context.Background()
-	inputs, md, err := generator.GetInput(proto, call)
+	call := slave.config.Method
+	inputs, md, err := generator.GetInput(call, md, fd)
 
 	if err != nil {
-		logrus.Error("Error creating client connection: %+v", err.Error())
+		logrus.Error("Error creating client connection: %v", err.Error())
 		return nil, err
 	}
-	start := boomer.Now()
-
+	start := time.Now()
 	stub, err := slave.Pool.Get()
 	if err != nil {
 		logrus.Error("Error getting stub: %v", err.Error())
 		return nil, err
 	}
 	res, err := stub.InvokeRpc(ctx, md, inputs[0])
-	elapsed := boomer.Now() - start
+	elapsed := time.Since(start)
 
 	if err != nil {
 		logrus.Error("Error InvokeRpc: %v", err.Error())
-		boomer.RecordFailure("tcp", call+" fail", elapsed, err.Error())
+		slaveBoomer.RecordFailure("tcp", call+" fail", elapsed.Nanoseconds()/int64(time.Millisecond), err.Error())
 		return nil, err
 	} else {
-		boomer.RecordSuccess("tcp", call, elapsed, int64(len(res.String())))
+		slaveBoomer.RecordSuccess("tcp", call, elapsed.Nanoseconds()/int64(time.Millisecond), int64(len(res.String())))
 	}
 	return res,nil
 }

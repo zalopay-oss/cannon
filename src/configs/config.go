@@ -2,35 +2,58 @@ package configs
 
 
 import (
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
+	"path/filepath"
+	"strings"
 )
 
-const configFilePath = "./configs"
-const configFileName = "config"
+const DefaultSlaveConfiguration = "./configs/default-slave-config.yaml"
+const DefaultCannonConfiguration = "./configs/default-cannon-config.yaml"
 
-//ServiceConfig struct
-type ServiceConfig struct {
-	GRPCPort     int
-	GRPCHost     string
-	NoConns      int
-	NoWorkers    int
-	Service      string
-	Proto        string
-	Data         string
-	HatchRate    int
-	Locust       string
-	DatabaseAddr string
-	Token        string
-	Measurement  string
-	Bucket       string
-	Origin		 string
+//SlaveConfig struct
+type SlaveConfig struct {
+	GRPCPort      int
+	GRPCHost      string
+	Method        string
+	Proto         string
+	LocustWebPort string
+	LocustHost    string
+	LocustPort    int
 }
 
-//LoadConfig load configs
-func LoadConfig() error {
-	viper.SetConfigName(configFileName)
-	viper.AddConfigPath(configFilePath)
-	viper.SetConfigType("yaml")
+//CannonConfig struct
+type CannonConfig struct {
+	NoWorkers     int
+	HatchRate     int
+	LocustWebPort string
+	LocustHost    string
+	LocustPort    int
+	DatabaseAddr  string
+	Token         string
+	Measurement   string
+	Bucket        string
+	Origin        string
+}
+
+
+func LoadDefaultSlaveConfig() error{
+	return LoadMyConfig(DefaultSlaveConfiguration)
+}
+
+func LoadDefaultCannonConfig() error{
+	return LoadMyConfig(DefaultCannonConfiguration)
+}
+
+func LoadMyConfig(path string) error {
+	dir := filepath.Dir(path)
+	name := strings.TrimSuffix(filepath.Base(path), filepath.Ext(path))
+	ext := filepath.Ext(path)
+	ext = ext[1:]
+	logrus.Warn(ext)
+	viper.SetConfigName(name)
+	viper.AddConfigPath(dir)
+	viper.SetConfigType(ext)
 
 	return viper.ReadInConfig()
 }

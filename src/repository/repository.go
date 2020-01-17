@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-func Save(cli *influxdb.Client, resId string, config *configs.ServiceConfig, distributedData map[string]string, requestData map[string]string) error {
+func Save(cli *influxdb.Client, resId string, config *configs.CannonConfig, distributedData map[string]string, requestData map[string]string) error {
 	logrus.Info(model.GetFields(config, distributedData, requestData))
 	myMetrics := []influxdb.Metric{
 		influxdb.NewRowMetric(

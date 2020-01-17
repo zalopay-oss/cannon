@@ -31,7 +31,7 @@ func toFloat(value string)float64 {
 }
 
 
-func GetFields(config *configs.ServiceConfig, distributedData map[string]string, requestData map[string]string) map[string]interface{} {
+func GetFields(config *configs.CannonConfig, distributedData map[string]string, requestData map[string]string) map[string]interface{} {
 	return map[string]interface{}{
 		"configs":         getConfigField(config),
 		"request":         toFloat(distributedData[REQUEST]),
@@ -48,13 +48,10 @@ func GetFields(config *configs.ServiceConfig, distributedData map[string]string,
 	}
 }
 
-func getConfigField(config *configs.ServiceConfig) string {
+func getConfigField(config *configs.CannonConfig) string {
 	res:= make(map[string]interface{})
-	res["server"]=config.Service
-	res["proto"]=config.Proto
 	res["hatchRate"]=config.HatchRate
-	res["users"]=config.NoWorkers
-	res["slaves"]=config.NoConns
+	res["workers"]=config.NoWorkers
 	stringRes, _ :=json.Marshal(res)
 	return string(stringRes)
 }

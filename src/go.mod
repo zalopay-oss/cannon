@@ -12,6 +12,7 @@ require (
 	github.com/myzhan/boomer v0.0.0-20191119082022-5424d6ac71e4
 	github.com/olekukonko/tablewriter v0.0.4 // indirect
 	github.com/sirupsen/logrus v1.4.2
+	github.com/spf13/cobra v0.0.3
 	github.com/spf13/viper v1.6.1
 	github.com/zeromq/goczmq v4.1.0+incompatible // indirect
 	github.com/zeromq/gomq v0.0.0-20181008000130-95dc37dee5c4 // indirect

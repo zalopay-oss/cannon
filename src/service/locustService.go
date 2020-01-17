@@ -11,9 +11,7 @@ import (
 
 var dbClient *influxdb.Client
 
-func GetResult(config *configs.ServiceConfig, id []byte) {
-
-
+func GetResult(config *configs.CannonConfig, id []byte) {
 	distributedResult, err := utils.GetDistributedFile(config)
 	if err != nil {
 		logrus.Fatal(err)
@@ -27,15 +25,15 @@ func GetResult(config *configs.ServiceConfig, id []byte) {
 	}
 }
 
-func Start(config *configs.ServiceConfig) {
+func Start(config *configs.CannonConfig) {
 	err := utils.StartLocust(config)
 	if err != nil {
-		log.Fatal("Start Locust ", err)
+		log.Fatal("Start Locust Test ", err)
 	}
-
 	dbClient, _ = influxdb.New(config.DatabaseAddr, config.Token)
 }
-func Stop(config *configs.ServiceConfig){
+
+func Stop(config *configs.CannonConfig){
 	utils.CloseLocust(config)
 	dbClient.Close()
 }

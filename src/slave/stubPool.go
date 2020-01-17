@@ -16,7 +16,7 @@ type StubPool struct{
 	mtx sync.Mutex
 }
 
-func NewStubPool(size int,config *configs.ServiceConfig) (*StubPool, error){
+func NewStubPool(size int,config *configs.SlaveConfig) (*StubPool, error){
 	res := &StubPool{index:0}
 	res.stubs = make([]grpcdynamic.Stub,0,size)
 	conns,err := openConnection(size, config)
@@ -33,9 +33,9 @@ func NewStubPool(size int,config *configs.ServiceConfig) (*StubPool, error){
 
 func (pool *StubPool)Get() (grpcdynamic.Stub,error){
 	if len(pool.stubs)==0{
+		logrus.Fatal("Empty")
 		return grpcdynamic.Stub{},errors.New("Empty pool")
 	}
-
 	pool.mtx.Lock()
 	i:= pool.index + 1
 	pool.index = uint64(int(i) % len(pool.stubs))
@@ -47,8 +47,7 @@ func (pool *StubPool)Get() (grpcdynamic.Stub,error){
 	return res,nil
 }
 
-func openConnection(size int, config *configs.ServiceConfig) ([]*grpc.ClientConn, error) {
-
+func openConnection(size int, config *configs.SlaveConfig) ([]*grpc.ClientConn, error) {
 	address := fmt.Sprintf("%s:%d", config.GRPCHost, config.GRPCPort)
 	res := make([]*grpc.ClientConn,0,size)
 	for i:=0;i<size;i++{

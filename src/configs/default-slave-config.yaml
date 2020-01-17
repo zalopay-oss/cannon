@@ -1,0 +1,10 @@
+
+LocustWebPort: "http://0.0.0.0:7000/"
+LocustHost: "127.0.0.1"
+LocustPort: 5557
+
+GRPCPort: 4770
+GRPCHost: "localhost"
+
+Method: "zas.protobuf.TransactionService.transRecord"
+Proto: "./transaction.proto"

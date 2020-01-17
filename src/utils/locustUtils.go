@@ -10,10 +10,10 @@ import (
 	"strings"
 )
 
-func StartLocust(config *configs.ServiceConfig) error{
+func StartLocust(config *configs.CannonConfig) error{
 	logrus.Info("START LOCUST")
 	data := "locust_count="+strconv.Itoa(config.NoWorkers)+"&hatch_rate="+strconv.Itoa(config.HatchRate)
-	des := config.Locust+"/swarm"
+	des := config.LocustWebPort +"/swarm"
 	req, err := http.NewRequest("POST",des,strings.NewReader(data))
 	if err!=nil{
 		return err
@@ -40,9 +40,9 @@ func StartLocust(config *configs.ServiceConfig) error{
 	return nil
 }
 
-func CloseLocust(config *configs.ServiceConfig) error{
+func CloseLocust(config *configs.CannonConfig) error{
 	logrus.Info("CLOSE LOCUST")
-	des := config.Locust+"/stop"
+	des := config.LocustWebPort +"/stop"
 	req, err := http.NewRequest("GET",des,nil)
 	if err!=nil{
 		return err
@@ -70,8 +70,8 @@ func CloseLocust(config *configs.ServiceConfig) error{
 
 
 
-func GetDistributedFile(config *configs.ServiceConfig) (map[string]string, error) {
-	des := config.Locust+"/stats/distribution/csv"
+func GetDistributedFile(config *configs.CannonConfig) (map[string]string, error) {
+	des := config.LocustWebPort +"/stats/distribution/csv"
 	req, err := http.NewRequest("GET",des,nil)
 	if err!=nil{
 		return nil, err
@@ -92,8 +92,8 @@ func GetDistributedFile(config *configs.ServiceConfig) (map[string]string, error
 }
 
 
-func GetRequestsFile(config *configs.ServiceConfig) (map[string]string, error) {
-	des := config.Locust + "/stats/requests/csv"
+func GetRequestsFile(config *configs.CannonConfig) (map[string]string, error) {
+	des := config.LocustWebPort + "/stats/requests/csv"
 	req, err := http.NewRequest("GET", des, nil)
 	if err != nil {
 		return nil, err
