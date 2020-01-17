@@ -2,7 +2,7 @@ package model
 
 import (
 	"encoding/json"
-	"github.com/tranndc/benchmark/configs"
+	"github.com/zalopay-oss/benchmark/configs"
 	"strconv"
 )
 

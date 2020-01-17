@@ -1,4 +1,4 @@
-module github.com/tranndc/benchmark
+module github.com/zalopay-oss/benchmark
 
 go 1.13
 

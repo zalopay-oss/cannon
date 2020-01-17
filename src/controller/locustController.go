@@ -2,8 +2,8 @@ package controller
 
 import (
 	"github.com/sirupsen/logrus"
-	"github.com/tranndc/benchmark/configs"
-	"github.com/tranndc/benchmark/service"
+	"github.com/zalopay-oss/benchmark/configs"
+	"github.com/zalopay-oss/benchmark/service"
 	"log"
 	"os"
 	"os/exec"

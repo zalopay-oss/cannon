@@ -2,7 +2,7 @@ package slave
 
 import (
 	"github.com/sirupsen/logrus"
-	"github.com/tranndc/benchmark/configs"
+	"github.com/zalopay-oss/benchmark/configs"
 )
 
 type Slave struct{

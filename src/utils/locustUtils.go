@@ -3,7 +3,7 @@ package utils
 import (
 	"fmt"
 	"github.com/sirupsen/logrus"
-	"github.com/tranndc/benchmark/configs"
+	"github.com/zalopay-oss/benchmark/configs"
 	"io/ioutil"
 	"net/http"
 	"strconv"

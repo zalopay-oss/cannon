@@ -4,8 +4,8 @@ import (
 	"context"
 	"github.com/influxdata/influxdb-client-go"
 	"github.com/sirupsen/logrus"
-	"github.com/tranndc/benchmark/configs"
-	"github.com/tranndc/benchmark/model"
+	"github.com/zalopay-oss/benchmark/configs"
+	"github.com/zalopay-oss/benchmark/model"
 	"time"
 )
 

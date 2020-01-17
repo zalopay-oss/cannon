@@ -1,8 +1,6 @@
 package configs
 
-
 import (
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"path/filepath"
 	"strings"
@@ -50,7 +48,6 @@ func LoadMyConfig(path string) error {
 	name := strings.TrimSuffix(filepath.Base(path), filepath.Ext(path))
 	ext := filepath.Ext(path)
 	ext = ext[1:]
-	logrus.Warn(ext)
 	viper.SetConfigName(name)
 	viper.AddConfigPath(dir)
 	viper.SetConfigType(ext)

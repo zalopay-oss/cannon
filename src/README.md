@@ -16,33 +16,70 @@
 
 ![architecture](images/architecture.png)
 
-## Run
+## Configuration
 
-- Edit configuration in file `configs/config.yaml`
+### Cannon Config
 
 ```yaml
-# Locust config
-Locust: "http://0.0.0.0:7000/" # Locust address
-NoConns: 1 # Number of connections | number of slaves
-NoWorkers: 80 # Number of users
+# Locust Config
+LocustWebPort: "http://0.0.0.0:7000/"
+LocustHost: "127.0.0.1"
+LocustPort: 5557
+NoWorkers: 80 # Number of connections
 HatchRate: 10 # Hatch rate
 
-# Influx DB config
-Bucket: "benchmark-results" # Bucket's name
-Origin: "zlp" # Influxdb Origin
-DatabaseAddr: "http://0.0.0.0:9999" # Database address
-Token: "e_jl06gwSsAmwStymP1hrSp3_-l8s56QFT9jzklJ_B_uTwu6L4h1BtjFRoYk3LgsDGKl562X8msWwbaQN5llQg==" # InfluxDB Token
+# InfluxDB Config
+Bucket: "benchmark-results" # Influx DB Bucket's name
+Origin: "zlp-osss"
+DatabaseAddr: "http://0.0.0.0:9999"
+Token: "egc6_K6V0pCmEwIahIzmnoneommTcsa7TS5XtmcSBnR9VeX31dMsRJ_STN-bUqOwWW77vPiU0aM9RGMQFwxT-A=="
 
-# GRPC config
-GRPCPort: 1234
-GRPCHost: "localhost"
-Service: "service.KeyValueStoreService.Connect" #  Service's name
-Proto: "path/to/name.proto" #link to proto
 ```
+
+### Slave Config
+
+```yaml
+# Locust Config
+LocustWebPort: "http://0.0.0.0:7000/"
+LocustHost: "127.0.0.1"
+LocustPort: 5557
+
+# gRPC Config
+GRPCPort: 4770
+GRPCHost: "localhost"
+Method: "serviceName.methodName"
+Proto: "./proto-name.proto"
+```
+
+## Run
 
 - Make sure Locust, InfluxDB and gRPC server are running.
-- Run:
+
+### Run Slave
 
 ```bash
-./run.sh
+Usage:
+  run [flags]
+
+Flags:
+  -c, --config string   Config file (default "./configs/default-slave-config.yaml")
+  -h, --help            help for run
+      --host string     Config gRPC host (default "localhost")
+  -m, --method string   Method name (default "service.PingService.ping")
+      --port int        Config gRPC port (default 5557)
+  -p, --proto string    Proto File (default "./transaction.proto")
 ```
+
+### Run Cannon
+
+```bash
+Usage:
+  run [flags]
+
+Flags:
+  -c, --config string    Config file (default "./configs/default-cannon-config.yaml")
+  -r, --hatchRate int    config Hatch rate (users spawned/second) (default 10)
+  -h, --help             help for run
+  -w, --no-workers int   Number of workers to simulate (default 800)
+```
+

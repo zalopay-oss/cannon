@@ -4,12 +4,10 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/tranndc/benchmark/configs"
-	"github.com/tranndc/benchmark/slave"
+	"github.com/zalopay-oss/benchmark/configs"
+	"github.com/zalopay-oss/benchmark/slave"
 	"os"
 )
-
-var DefaultConfigFile = "./configs/config.yaml"
 
 var proto string
 var method string
@@ -24,7 +22,7 @@ var rootCmd = &cobra.Command{
 	Short: "Run Cannon",
 	Long: `Command run Cannon`,
 	Run: func(cmd *cobra.Command, args []string) {
-		if configFile != DefaultConfigFile {
+		if configFile != configs.DefaultSlaveConfiguration {
 			config = &configs.SlaveConfig{}
 			if err := configs.LoadMyConfig(configFile); err != nil {
 				logrus.Fatal("Load config: ", err)
@@ -60,7 +58,7 @@ func Execute() {
 	}
 	rootCmd.PersistentFlags().StringVarP(&method, "method","m", config.Method , "Method name")
 	rootCmd.PersistentFlags().StringVarP(&proto, "proto", "p", config.Proto, "Proto File")
-	rootCmd.PersistentFlags().StringVarP(&configFile, "config", "c", DefaultConfigFile, "Config file")
+	rootCmd.PersistentFlags().StringVarP(&configFile, "config", "c", configs.DefaultSlaveConfiguration, "Config file")
 	rootCmd.PersistentFlags().StringVar(&grpcHost, "host", config.GRPCHost, "Config gRPC host")
 	rootCmd.PersistentFlags().IntVar(&grpcPort, "port", config.LocustPort, "Config gRPC port")
 

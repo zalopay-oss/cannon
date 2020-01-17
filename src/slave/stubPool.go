@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/jhump/protoreflect/dynamic/grpcdynamic"
 	"github.com/sirupsen/logrus"
-	"github.com/tranndc/benchmark/configs"
+	"github.com/zalopay-oss/benchmark/configs"
 	"google.golang.org/grpc"
 	"sync"
 )

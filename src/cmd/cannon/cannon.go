@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/tranndc/benchmark/cmd/cannon/cannonCmd"
+	"github.com/zalopay-oss/benchmark/cmd/cannon/cannonCmd"
 )
 
 

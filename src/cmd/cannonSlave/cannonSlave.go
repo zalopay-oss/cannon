@@ -1,6 +1,6 @@
 package main
 
-import "github.com/tranndc/benchmark/cmd/cannonSlave/slaveCmd"
+import "github.com/zalopay-oss/benchmark/cmd/cannonSlave/slaveCmd"
 
 func main(){
 	slaveCmd.Execute()

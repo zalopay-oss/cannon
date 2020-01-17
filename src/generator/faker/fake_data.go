@@ -3,8 +3,8 @@ package faker
 import (
 	"encoding/json"
 	"github.com/jhump/protoreflect/desc"
-	"github.com/tranndc/benchmark/generator/parser"
-	"github.com/tranndc/benchmark/generator/random"
+	"github.com/zalopay-oss/benchmark/generator/parser"
+	"github.com/zalopay-oss/benchmark/generator/random"
 	"math/rand"
 	"strings"
 )

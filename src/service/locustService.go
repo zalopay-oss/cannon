@@ -3,9 +3,9 @@ package service
 import (
 	"github.com/influxdata/influxdb-client-go"
 	"github.com/sirupsen/logrus"
-	"github.com/tranndc/benchmark/configs"
-	"github.com/tranndc/benchmark/repository"
-	"github.com/tranndc/benchmark/utils"
+	"github.com/zalopay-oss/benchmark/configs"
+	"github.com/zalopay-oss/benchmark/repository"
+	"github.com/zalopay-oss/benchmark/utils"
 	"log"
 )
 

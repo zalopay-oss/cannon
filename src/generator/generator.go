@@ -6,7 +6,7 @@ import (
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/dynamic"
-	"github.com/tranndc/benchmark/generator/faker"
+	"github.com/zalopay-oss/benchmark/generator/faker"
 	"strings"
 )
 
