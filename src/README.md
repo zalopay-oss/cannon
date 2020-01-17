@@ -1,20 +1,29 @@
 # Zalopay-Cannon v0.1.1
 
+![version](https://img.shields.io/badge/version-0.1.1-red) [![issues](https://img.shields.io/badge/open%20issues-0-orange)]() [![contributors](https://img.shields.io/badge/contributors-2-blue)]()
+
+## Introduction
+
+ZaloPay Cannon is a benchmark system for ZaloPay's internal service. The aim is to build a multi-tennant system which provides intuitive UI/UX for users to submit tasks and perform benchmark.  
+
+## Architecture
+
+![architecture](images/architecture.png)  
+
+## Features
+
+- Benchmark gRPC service with given proto.  
+- Distributed testing: run tests on multiple slaves.  
+- Automatically generate input data.  
+- Visualize data: metrics data is stored and visualized using InfluxDB.  
+- Only support Unary RPCs.  
+
 ## Requirements
 
 - Golang 1.13.1
 - Locust
 - Influxdb 2.0
-- Python 3.7.3
-
-## Features
-
-- Benchmark gRPC service with given proto
-- Only support Unary RPCs
-
-## Architecture
-
-![architecture](images/architecture.png)
+- Python 3.7.3  
 
 ## Run
 
