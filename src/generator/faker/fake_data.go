@@ -1,10 +1,11 @@
 package faker
 
 import (
-	"encoding/json"
-	"github.com/jhump/protoreflect/desc"
 	"github.com/zalopay-oss/benchmark/generator/parser"
 	"github.com/zalopay-oss/benchmark/generator/random"
+	"encoding/json"
+	"fmt"
+	"github.com/jhump/protoreflect/desc"
 	"math/rand"
 	"strings"
 )
@@ -57,11 +58,11 @@ func FakeDataForMessage(objRef *map[string]interface{}, serviceClass string, msg
 	for _, f := range(fields) {
 		msgType := f.GetType().String()
 		label := f.GetLabel().String()
+		// Check if a field is a candidate field in oneof
 		if !checkInOneOfList(f.GetName(), oneOfFields) && f.GetOneOf() != nil {
 			continue
 		}
 		if msgType == "TYPE_ENUM" {
-			// fmt.Println(f.GetEnumType().GetName())
 			obj[f.GetName()] = getValueForEnum(f, serviceClass, fileDesc)
 		} else if label == "LABEL_REPEATED" && msgType == "TYPE_MESSAGE" {
 			nestedMsg := f.GetMessageType()
@@ -84,6 +85,7 @@ func FakeDataForMessage(objRef *map[string]interface{}, serviceClass string, msg
 func getValueNestedFields(field *desc.FieldDescriptor, serviceClass string, fileDesc *desc.FileDescriptor) interface{} {
 	msg := field.GetMessageType()
 
+	// If it is a map type
 	if msg.GetMessageOptions().GetMapEntry() {
 		mapLen := random.RandomSliceAndMapSize()
 		keyType := field.GetMapKeyType()
@@ -97,6 +99,7 @@ func getValueNestedFields(field *desc.FieldDescriptor, serviceClass string, file
 		}
 		return mapObj
 	} else {
+		// If not a map then this field is a list/slice/array
 		objList := getValueForList(field.GetType().String(), field, serviceClass, fileDesc)
 		return objList
 	}
@@ -118,8 +121,8 @@ func getValueNormalFields(
 			}
 		}
 	}
-	msgType := field.GetType().String()
 
+	msgType := field.GetType().String()
 	fieldType := field.GetType().String()
 	label := field.GetLabel().String()
 
@@ -137,10 +140,8 @@ func getValueNormalFields(
 		}
 	} else if label == "LABEL_REPEATED" {
 		objList := getValueForList(fieldType, field, serviceClass, fileDesc)
-		// fmt.Println(objList)
 		return objList
 	} else if fieldType == "TYPE_MESSAGE" {
-		// childObj := make(map[string]interface{})
 		m := fileDesc.FindMessage(serviceClass + "." + field.GetMessageType().GetName())
 		fieldList := m.GetFields()
 		if m != nil {
@@ -165,7 +166,9 @@ func getValueNormalFields(
 func getValueForList(msgType string, f *desc.FieldDescriptor, serviceClass string, fileDesc *desc.FileDescriptor) []interface{} {
 	listType := f.GetType().String()
 	numObjs := random.RandomSliceAndMapSize()
+
 	objList := make([]interface{}, numObjs)
+
 	if listType == "TYPE_MESSAGE" {
 		m := fileDesc.FindMessage(serviceClass + "." + f.GetMessageType().GetName())
 		if m != nil {
@@ -193,9 +196,10 @@ func getValueForList(msgType string, f *desc.FieldDescriptor, serviceClass strin
 }
 
 func getValueForEnum(field *desc.FieldDescriptor, serviceClass string, fileDesc *desc.FileDescriptor) int {
+	fmt.Println(field.GetEnumType().GetName())
 	enumMsg := fileDesc.FindEnum(serviceClass + "." + field.GetEnumType().GetName())
 	enumLen := len(enumMsg.GetValues())
-	bound := random.NumberBoundary{Start: 1, End: enumLen}
+	bound := random.NumberBoundary{Start: 0, End: enumLen}
 	enumVal := random.RandomIntegerWithBoundary(bound)
 	return enumVal
 }
@@ -249,6 +253,8 @@ func assignValueScalaType(msgType string) interface{} {
 		value = rand.Float64()
 	case "TYPE_BOOL":
 		value = rand.Intn(2) > 0
+	case "TYPE_BYTES":
+		value = random.RandomBytesData()
 	default:
 		value = nil
 	}
