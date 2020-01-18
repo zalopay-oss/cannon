@@ -6,8 +6,8 @@ This document describes the roadmap for Zalopay Cannon development.
 
 Features:
 
-- Web interface for config benchmark and visualize report
-- Support more generate types: sequence, environment (like timestamp), value in file input by json configuration defination
+- Web interface for configuring benchmark and visualizing report
+- Support generating more types: sequence, environment (like timestamp), value in file input by json configuration definition  
 
 ## ZaloPay Cannon v0.3.0
 
@@ -24,4 +24,4 @@ Features:
 - Support run multiple benchmark job
 - Manage and schedule tasks (in case of exhausted resources)
 - Optimize performance of worker
-- Support complex business flows with state machine defination
+- Support complex business flows with state machine definition
