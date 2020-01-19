@@ -3,6 +3,7 @@ module github.com/zalopay-oss/benchmark
 go 1.13
 
 require (
+	github.com/apex/log v1.1.0
 	github.com/asaskevich/EventBus v0.0.0-20180315140547-d46933a94f05 // indirect
 	github.com/golang/protobuf v1.3.2
 	github.com/google/uuid v1.1.1 // indirect
@@ -11,6 +12,8 @@ require (
 	github.com/jhump/protoreflect v1.6.0
 	github.com/myzhan/boomer v0.0.0-20191119082022-5424d6ac71e4
 	github.com/olekukonko/tablewriter v0.0.4 // indirect
+	github.com/palantir/stacktrace v0.0.0-20161112013806-78658fd2d177
+	github.com/pkg/errors v0.8.1
 	github.com/sirupsen/logrus v1.4.2
 	github.com/spf13/cobra v0.0.3
 	github.com/spf13/viper v1.6.1
