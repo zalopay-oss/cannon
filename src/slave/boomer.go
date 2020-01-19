@@ -107,7 +107,7 @@ func (slave *Slave) invoke() (proto.Message, error) {
 
 	if err != nil {
 		logrus.Error("Error InvokeRpc: %v", err.Error())
-		slaveBoomer.RecordFailure("tcp", call+" fail", elapsed.Nanoseconds()/int64(time.Millisecond), err.Error())
+		slaveBoomer.RecordFailure("tcp", call, elapsed.Nanoseconds()/int64(time.Millisecond), err.Error())
 		return nil, err
 	} else {
 		slaveBoomer.RecordSuccess("tcp", call, elapsed.Nanoseconds()/int64(time.Millisecond), int64(len(res.String())))
