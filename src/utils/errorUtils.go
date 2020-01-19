@@ -3,6 +3,7 @@ package utils
 import (
 	"fmt"
 	"github.com/sirupsen/logrus"
+	"os"
 	"runtime"
 	"strings"
 )
@@ -28,6 +29,9 @@ func WrapError(err error) StackError {
 func Log(level logrus.Level, err error, msg string) {
 	if err != nil {
 		logrus.New().Log(level, msg, WrapError(err))
+		if level == logrus.FatalLevel {
+			os.Exit(1)
+		}
 	} else {
 		logrus.New().Log(level, msg)
 	}
