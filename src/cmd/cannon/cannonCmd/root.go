@@ -15,10 +15,10 @@ var hatchRate int
 var configFile string
 var config *configs.CannonConfig
 
-var rootCmd = &cobra.Command{
+var masterCmd = &cobra.Command{
 	Use:   "run",
 	Short: "Run Cannon",
-	Long: `Command run Cannon`,
+	Long:  `Command run Cannon`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if configFile != configs.DefaultCannonConfiguration {
 			config = &configs.CannonConfig{}
@@ -37,8 +37,7 @@ var rootCmd = &cobra.Command{
 	},
 }
 
-
-func Execute() {
+func loadConfigFile() {
 	config = &configs.CannonConfig{}
 	if err := configs.LoadDefaultCannonConfig(); err != nil {
 		logrus.Fatal("Load config: ", err)
@@ -48,9 +47,21 @@ func Execute() {
 		logrus.Fatal("Load config: ", err)
 		os.Exit(1)
 	}
-	rootCmd.PersistentFlags().IntVarP(&hatchRate, "hatchRate","r", config.HatchRate , "config Hatch rate (users spawned/second)")
-	rootCmd.PersistentFlags().IntVarP(&noUsers, "no-workers", "w", config.NoWorkers, "Number of workers to simulate")
-	rootCmd.PersistentFlags().StringVarP(&configFile, "config", "c", configs.DefaultCannonConfiguration, "Config file")
+}
+
+func initFlagsMasterCannon() {
+	masterCmd.PersistentFlags().IntVarP(&hatchRate, "hatchRate", "r", config.HatchRate, "config Hatch rate (users spawned/second)")
+	masterCmd.PersistentFlags().IntVarP(&noUsers, "no-workers", "w", config.NoWorkers, "Number of workers to simulate")
+	masterCmd.PersistentFlags().StringVarP(&configFile, "config", "c", configs.DefaultCannonConfiguration, "Config file")
+}
+
+func Execute() {
+	loadConfigFile()
+	initFlagsMasterCannon()
+
+	var rootCmd = &cobra.Command{Use: "cannon"}
+	rootCmd.AddCommand(masterCmd)
+	rootCmd.SetVersionTemplate("0.1.0")
 	if err := rootCmd.Execute(); err != nil {
 		os.Exit(1)
 	}

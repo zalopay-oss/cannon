@@ -6,7 +6,6 @@ import (
 	"github.com/zalopay-oss/benchmark/configs"
 	"github.com/zalopay-oss/benchmark/repository"
 	"github.com/zalopay-oss/benchmark/utils"
-	"log"
 )
 
 var dbClient *influxdb.Client
@@ -20,20 +19,36 @@ func GetResult(config *configs.CannonConfig, id []byte) {
 	if err != nil {
 		logrus.Fatal(err)
 	}
-	if err = repository.Save(dbClient, string(id), config, distributedResult, requestResult); err !=nil{
-		logrus.Fatal(err)
+	if err = repository.Save(dbClient, string(id), config, distributedResult, requestResult); err != nil {
+		logrus.Fatal(utils.WrapError(err))
 	}
 }
 
 func Start(config *configs.CannonConfig) {
-	err := utils.StartLocust(config)
+	// TODO: get locust status
+	msg, err := utils.GetLocustStatus(config)
 	if err != nil {
-		log.Fatal("Start Locust Test ", err)
+		utils.Log(logrus.FatalLevel, err, "Fail GetLocustStatus")
 	}
-	dbClient, _ = influxdb.New(config.DatabaseAddr, config.Token)
+
+	if msg.State != "stopping" {
+		err = utils.StartLocust(config)
+		if err != nil {
+			utils.Log(logrus.FatalLevel, err, "Fail StartLocust")
+		}
+	}
+
+	if config.IsPersistent {
+		dbClient, _ = influxdb.New(config.DatabaseAddr, config.Token)
+	}
+
+	utils.Log(logrus.InfoLevel, nil, "Start Cannon service success")
 }
 
-func Stop(config *configs.CannonConfig){
+func Stop(config *configs.CannonConfig) {
 	utils.CloseLocust(config)
-	dbClient.Close()
+
+	if dbClient != nil {
+		dbClient.Close()
+	}
 }

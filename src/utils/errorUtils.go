@@ -2,6 +2,7 @@ package utils
 
 import (
 	"fmt"
+	"github.com/sirupsen/logrus"
 	"runtime"
 	"strings"
 )
@@ -24,6 +25,14 @@ func WrapError(err error) StackError {
 	return StackError{Err: err, StackTrace: getStackTrace()}
 }
 
+func Log(level logrus.Level, err error, args ...interface{}) {
+	if err != nil {
+		logrus.New().Log(level, args, WrapError(err))
+	} else {
+		logrus.New().Log(level, args)
+	}
+}
+
 func getStackTrace() string {
 	stackBuf := make([]uintptr, maxStackLength)
 	length := runtime.Callers(3, stackBuf[:])
@@ -34,7 +43,7 @@ func getStackTrace() string {
 	for {
 		frame, more := frames.Next()
 		if !strings.Contains(frame.File, "runtime/") {
-			trace = trace + fmt.Sprintf("\n\t file: %s - line: %d - func: %s", frame.File, frame.Line, frame.Function)
+			trace = trace + fmt.Sprintf("\n\t %s \n\t\t %s:%d", frame.Function, frame.File, frame.Line)
 		}
 		if !more {
 			break
