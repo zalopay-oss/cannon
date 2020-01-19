@@ -1,17 +1,17 @@
 package faker
 
 import (
-	"github.com/zalopay-oss/benchmark/generator/parser"
-	"github.com/zalopay-oss/benchmark/generator/random"
 	"encoding/json"
-	"fmt"
-	"github.com/jhump/protoreflect/desc"
 	"math/rand"
 	"strings"
+
+	"github.com/jhump/protoreflect/desc"
+	"github.com/zalopay-oss/benchmark/generator/parser"
+	"github.com/zalopay-oss/benchmark/generator/random"
 )
 
 func FakeData(call, inputMessage string, fileDesc *desc.FileDescriptor) (string, error) {
-	_ = random.SetRandomNumberBoundaries(1,100)
+	_ = random.SetRandomNumberBoundaries(1, 100)
 	_ = random.SetRandomStringLength(30)
 	_ = random.SetRandomMapAndSliceSize(5)
 
@@ -19,12 +19,12 @@ func FakeData(call, inputMessage string, fileDesc *desc.FileDescriptor) (string,
 	files[fileDesc.GetName()] = fileDesc
 
 	msgList := fileDesc.GetMessageTypes()
-	svc, _, _  := parser.ParseServiceMethod(call)
+	svc, _, _ := parser.ParseServiceMethod(call)
 	pos := strings.LastIndex(svc, ".")
 	serviceClass := svc[:pos]
 
 	var jsonStr string = ""
-	for _, msg := range(msgList) {
+	for _, msg := range msgList {
 		if msg.GetName() == inputMessage {
 			structObj := make(map[string]interface{})
 			result := FakeDataForMessage(&structObj, serviceClass, msg, fileDesc)
@@ -50,12 +50,12 @@ func FakeDataForMessage(objRef *map[string]interface{}, serviceClass string, msg
 	nestedMsgList := msg.GetNestedMessageTypes()
 	nestedMsgNames := make(map[string]int)
 	if nestedMsgList != nil && len(nestedMsgList) > 0 {
-		for _, nst := range(nestedMsgList) {
+		for _, nst := range nestedMsgList {
 			nestedMsgNames[nst.GetName()] = 1
 		}
 	}
 
-	for _, f := range(fields) {
+	for _, f := range fields {
 		msgType := f.GetType().String()
 		label := f.GetLabel().String()
 		// Check if a field is a candidate field in oneof
@@ -92,7 +92,7 @@ func getValueNestedFields(field *desc.FieldDescriptor, serviceClass string, file
 		valType := field.GetMapValueType()
 		mapObj := make(map[string]interface{})
 
-		for i:=0; i < mapLen; i++ {
+		for i := 0; i < mapLen; i++ {
 			keyVal := getValueNormalFields(keyType, msg, serviceClass, fileDesc)
 			valVal := getValueNormalFields(valType, msg, serviceClass, fileDesc)
 			mapObj[keyVal.(string)] = valVal
@@ -116,7 +116,7 @@ func getValueNormalFields(
 	if msg != nil {
 		nestedMsgList := msg.GetNestedMessageTypes()
 		if nestedMsgList != nil && len(nestedMsgList) > 0 {
-			for _, nst := range(nestedMsgList) {
+			for _, nst := range nestedMsgList {
 				nestedMsgNames[nst.GetName()] = 1
 			}
 		}
@@ -146,10 +146,10 @@ func getValueNormalFields(
 		fieldList := m.GetFields()
 		if m != nil {
 			msgValue := make(map[string]interface{})
-			for _, field := range(fieldList) {
+			for _, field := range fieldList {
 				// Get one field in OneOf
 				oneOfFields := getOneOfNamesList(msg)
-				if !checkInOneOfList(field.GetName(), oneOfFields) && field.GetOneOf() != nil{
+				if !checkInOneOfList(field.GetName(), oneOfFields) && field.GetOneOf() != nil {
 					continue
 				}
 				msgValue[field.GetName()] = getValueNormalFields(field, m, serviceClass, fileDesc)
@@ -175,7 +175,7 @@ func getValueForList(msgType string, f *desc.FieldDescriptor, serviceClass strin
 			fieldList := m.GetFields()
 			for i := 0; i < numObjs; i++ {
 				eleObj := make(map[string]interface{})
-				for _, field := range(fieldList) {
+				for _, field := range fieldList {
 					oneOfFields := getOneOfNamesList(m)
 					if !checkInOneOfList(field.GetName(), oneOfFields) && field.GetOneOf() != nil {
 						continue
@@ -187,7 +187,7 @@ func getValueForList(msgType string, f *desc.FieldDescriptor, serviceClass strin
 			}
 		}
 	} else {
-		for i:=0; i < numObjs; i++ {
+		for i := 0; i < numObjs; i++ {
 			element := assignValueScalaType(msgType)
 			objList[i] = element
 		}
@@ -196,7 +196,6 @@ func getValueForList(msgType string, f *desc.FieldDescriptor, serviceClass strin
 }
 
 func getValueForEnum(field *desc.FieldDescriptor, serviceClass string, fileDesc *desc.FileDescriptor) int {
-	fmt.Println(field.GetEnumType().GetName())
 	enumMsg := fileDesc.FindEnum(serviceClass + "." + field.GetEnumType().GetName())
 	enumLen := len(enumMsg.GetValues())
 	bound := random.NumberBoundary{Start: 0, End: enumLen}
@@ -205,7 +204,7 @@ func getValueForEnum(field *desc.FieldDescriptor, serviceClass string, fileDesc 
 }
 
 func checkInOneOfList(fieldName string, oneOfList []string) bool {
-	for _, oneOfName := range(oneOfList) {
+	for _, oneOfName := range oneOfList {
 		if oneOfName == fieldName {
 			return true
 		}
@@ -216,7 +215,7 @@ func checkInOneOfList(fieldName string, oneOfList []string) bool {
 func getOneOfNamesList(msg *desc.MessageDescriptor) []string {
 	oneOfs := msg.GetOneOfs()
 	var oneOfFields []string
-	for _, oneOf := range(oneOfs) {
+	for _, oneOf := range oneOfs {
 		choices := oneOf.GetChoices()
 		choiceIdx := random.RandomIntegerWithBoundary(random.NumberBoundary{Start: 0, End: len(choices)})
 		oneOfFields = append(oneOfFields, choices[choiceIdx].GetName())
@@ -253,8 +252,8 @@ func assignValueScalaType(msgType string) interface{} {
 		value = rand.Float64()
 	case "TYPE_BOOL":
 		value = rand.Intn(2) > 0
-	case "TYPE_BYTES":
-		value = random.RandomBytesData()
+	// case "TYPE_BYTES":
+	// 	value = random.RandomBytesData()
 	default:
 		value = nil
 	}
