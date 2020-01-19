@@ -1,63 +1,94 @@
-# Benchmark System
+# Zalopay Cannon v0.1.1
 
-## Requirement
+![version](https://img.shields.io/badge/version-0.1.1-red) [![issues](https://img.shields.io/badge/open%20issues-0-orange)]() [![contributors](https://img.shields.io/badge/contributors-2-blue)]()
 
-- Support load test as code
-- Support simulate multiple protocol (gRPC, HTTP,...)
-- Flexible configuration
-- UI to client can: config task, submit task, view report
-- Persistent data
-  
-## Specification
+## Introduction
 
-### Flowchart
+ZaloPay Cannon is a benchmark system for ZaloPay's internal service. The aim is to build a multi-tennant system which provides intuitive UI/UX for users to submit tasks and perform benchmark.  
 
-```plantuml
-@startuml
-participant Client
-participant LocustController
-participant Locust
-participant Worker
-participant Database
+## Architecture
 
-== ExecuteTest ==
+![architecture](images/architecture.png)  
 
-Client -> LocustController: upload config
-LocustController -> LocustController: parsing config
-LocustController -> Database: save config and task
-LocustController -> Locust: execute benchmark task
-Locust -> Worker: run task
-Worker --> Locust: recorded metrics
+## Features
 
-== QueryMetrics ==
+- Benchmark gRPC service with given proto.  
+- Distributed testing: run tests on multiple slaves.  
+- Automatically generate input data.  
+- Visualize data: metrics data is stored and visualized using InfluxDB.  
+- Only support Unary RPCs.  
 
-LocustController -> Locust: get recorded metrics
-Locust --> LocustController: metrics
-LocustController -> Database: save metrics
+## Requirements
 
-@enduml
+- Golang 1.13.1
+- Locust
+- Influxdb 2.0
+- Python 3.7.3  
+
+## Configuration
+
+### Cannon Config
+
+```yaml
+# Locust Config
+LocustWebPort: "http://0.0.0.0:7000/"
+LocustHost: "127.0.0.1"
+LocustPort: 5557
+NoWorkers: 80 # Number of connections
+HatchRate: 10 # Hatch rate
+
+# InfluxDB Config
+Bucket: "benchmark-results" # Influx DB Bucket's name
+Origin: "zlp-osss"
+DatabaseAddr: "http://0.0.0.0:9999"
+Token: "egc6_K6V0pCmEwIahIzmnoneommTcsa7TS5XtmcSBnR9VeX31dMsRJ_STN-bUqOwWW77vPiU0aM9RGMQFwxT-A=="
+
 ```
 
-## Planning
+### Slave Config
 
-### Sprint 1 (v0.1.1)
+```yaml
+# Locust Config
+LocustWebPort: "http://0.0.0.0:7000/"
+LocustHost: "127.0.0.1"
+LocustPort: 5557
 
-Overview:
+# gRPC Config
+GRPCPort: 4770
+GRPCHost: "localhost"
+Method: "serviceName.methodName"
+Proto: "./proto-name.proto"
+```
 
-- Basic benchmark tool.
-- CLI tool features:
-  - Connect Locust and work as slave.
-  - Auto generate data and request server by specific proto file.
-  - Test configuration: hatch rate, concurrent user, target service.
-  - Render report to LocustUI.
+## Run
 
-Deliveriable:
+- Make sure Locust, InfluxDB and gRPC server are running.
 
-- Source code
-- Documentations: sequence diagram , usecase, internal service, technical stack.
+### Run Slave
 
-[Detail](src/README.md)
+```bash
+Usage:
+  run [flags]
 
-### Sprint 2
+Flags:
+  -c, --config string   Config file (default "./configs/default-slave-config.yaml")
+  -h, --help            help for run
+      --host string     Config gRPC host (default "localhost")
+  -m, --method string   Method name (default "service.PingService.ping")
+      --port int        Config gRPC port (default 5557)
+  -p, --proto string    Proto File (default "./transaction.proto")
+```
 
-`TBD`
+### Run Cannon
+
+```bash
+Usage:
+  run [flags]
+
+Flags:
+  -c, --config string    Config file (default "./configs/default-cannon-config.yaml")
+  -r, --hatchRate int    config Hatch rate (users spawned/second) (default 10)
+  -h, --help             help for run
+  -w, --no-workers int   Number of workers to simulate (default 800)
+```
+
