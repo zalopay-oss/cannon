@@ -54,7 +54,7 @@ func (slave *Slave) RunTask(waitRun *sync.WaitGroup) {
 	md, err, fd = parser.GetMethodDescFromProto(slave.config.Method, slave.config.Proto, []string{})
 
 	if err != nil {
-		utils.Log(logrus.FatalLevel, err, "Error read file proto")
+		utils.Log(logrus.FatalLevel, err, "Error read file proto ")
 		return
 	}
 
