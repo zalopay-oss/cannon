@@ -11,8 +11,8 @@ Token: "egc6_K6V0pCmEwIahIzm9i52ommTcsa7TS5XtmcSBnR9VeX31dMsRJ_STN-bUqOwWW77vPiU
 Bucket: "benchmark-results"
 Origin: "tranndc"
 
-GRPCPort: 4770
+GRPCPort: 9600
 GRPCHost: "localhost"
 
-Method: "zas.protobuf.TransactionService.transRecord"
-Proto: "./transaction.proto"
+Method: "ping.PingService.Ping"
+Proto: "../example/proto/ping.proto"
