@@ -12,10 +12,22 @@ import (
 	"github.com/zalopay-oss/benchmark/model"
 )
 
+func checkResponse(resp *http.Response) {
+	var response model.LocustCommandResponse
+	body, _ := ioutil.ReadAll(resp.Body)
+
+	json.Unmarshal(body, &response)
+
+	if response.Success {
+		Log(logrus.ErrorLevel, nil, "Close test fail: "+response.Message)
+	}
+}
+
+// StartLocust call locust API to start the test
 func StartLocust(config *configs.CannonConfig) error {
-	logrus.Info("START LOCUST")
+	logrus.Info("Starting the test...")
 	data := "locust_count=" + strconv.Itoa(config.NoWorkers) + "&hatch_rate=" + strconv.Itoa(config.HatchRate)
-	des := config.LocustWebPort + "/swarm"
+	des := config.LocustWebTarget + "/swarm"
 	req, err := http.NewRequest("POST", des, strings.NewReader(data))
 	if err != nil {
 		return err
@@ -36,15 +48,13 @@ func StartLocust(config *configs.CannonConfig) error {
 	}
 	defer resp.Body.Close()
 
-	// TODO: review this
-	body, _ := ioutil.ReadAll(resp.Body)
-	logrus.Info(string(body))
+	checkResponse(resp)
 	return nil
 }
 
 func CloseLocust(config *configs.CannonConfig) error {
-	logrus.Info("CLOSE LOCUST")
-	des := config.LocustWebPort + "/stop"
+	logrus.Info("Stopping the test...")
+	des := config.LocustWebTarget + "/stop"
 	req, err := http.NewRequest("GET", des, nil)
 	if err != nil {
 		return err
@@ -63,14 +73,12 @@ func CloseLocust(config *configs.CannonConfig) error {
 	}
 	defer resp.Body.Close()
 
-	// TODO: review this
-	body, _ := ioutil.ReadAll(resp.Body)
-	logrus.Info(string(body))
+	checkResponse(resp)
 	return nil
 }
 
 func GetDistributedFile(config *configs.CannonConfig) (map[string]string, error) {
-	des := config.LocustWebPort + "/stats/distribution/csv"
+	des := config.LocustWebTarget + "/stats/distribution/csv"
 	req, err := http.NewRequest("GET", des, nil)
 	if err != nil {
 		return nil, err
@@ -91,7 +99,7 @@ func GetDistributedFile(config *configs.CannonConfig) (map[string]string, error)
 }
 
 func GetRequestsFile(config *configs.CannonConfig) (map[string]string, error) {
-	des := config.LocustWebPort + "/stats/requests/csv"
+	des := config.LocustWebTarget + "/stats/requests/csv"
 	req, err := http.NewRequest("GET", des, nil)
 	if err != nil {
 		return nil, err
@@ -112,7 +120,7 @@ func GetRequestsFile(config *configs.CannonConfig) (map[string]string, error) {
 }
 
 func GetLocustStatus(config *configs.CannonConfig) (*model.LocustStatus, error) {
-	des := config.LocustWebPort + "/stats/requests"
+	des := config.LocustWebTarget + "/stats/requests"
 	req, err := http.NewRequest("GET", des, nil)
 	if err != nil {
 		return nil, err
@@ -121,7 +129,7 @@ func GetLocustStatus(config *configs.CannonConfig) (*model.LocustStatus, error) 
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		panic(err)
+		Log(logrus.FatalLevel, err, "Cannot connect locustWebTarget:"+config.LocustWebTarget)
 	}
 	defer resp.Body.Close()
 

@@ -6,28 +6,14 @@ import (
 	"strings"
 )
 
-const DefaultSlaveConfiguration = "./configs/default-slave-config.yaml"
-const DefaultCannonConfiguration = "./configs/default-cannon-config.yaml"
-
-//SlaveConfig struct
-type SlaveConfig struct {
-	GRPCPort      int
-	GRPCHost      string
-	Method        string
-	Proto         string
-	LocustWebPort string
-	LocustHost    string
-	LocustPort    int
-}
-
 //CannonConfig struct
 type CannonConfig struct {
 	NoWorkers int
 	HatchRate int
 
-	LocustWebPort string
-	LocustHost    string
-	LocustPort    int
+	LocustWebTarget string
+	LocustHost      string
+	LocustPort      int
 
 	IsPersistent bool
 	DatabaseAddr string
@@ -35,14 +21,37 @@ type CannonConfig struct {
 	Measurement  string
 	Bucket       string
 	Origin       string
+
+	GRPCPort int
+	GRPCHost string
+
+	Method string
+	Proto  string
+
+	ConfigFile string
 }
 
-func LoadDefaultSlaveConfig() error {
-	return LoadMyConfig(DefaultSlaveConfiguration)
-}
+func NewDefaultCannonConfig() *CannonConfig {
+	return &CannonConfig{
+		NoWorkers: 10,
+		HatchRate: 10,
 
-func LoadDefaultCannonConfig() error {
-	return LoadMyConfig(DefaultCannonConfiguration)
+		LocustWebTarget: "http://0.0.0.0:8089/",
+		LocustHost:      "localhost",
+		LocustPort:      5557,
+
+		IsPersistent: false,
+		DatabaseAddr: "",
+		Token:        "",
+		Measurement:  "",
+		Bucket:       "",
+		Origin:       "",
+
+		GRPCHost: "localhost",
+		GRPCPort: 8000,
+		Method:   "transRecord",
+		Proto:    "transaction.proto",
+	}
 }
 
 func LoadMyConfig(path string) error {

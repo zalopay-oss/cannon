@@ -25,11 +25,11 @@ func WrapError(err error) StackError {
 	return StackError{Err: err, StackTrace: getStackTrace()}
 }
 
-func Log(level logrus.Level, err error, args ...interface{}) {
+func Log(level logrus.Level, err error, msg string) {
 	if err != nil {
-		logrus.New().Log(level, args, WrapError(err))
+		logrus.New().Log(level, msg, WrapError(err))
 	} else {
-		logrus.New().Log(level, args)
+		logrus.New().Log(level, msg)
 	}
 }
 

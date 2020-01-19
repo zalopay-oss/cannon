@@ -12,16 +12,16 @@ import (
 	"time"
 )
 
-func Run(config *configs.CannonConfig){
+func Run(config *configs.CannonConfig) {
 	var stop = make(chan bool)
-	service.Start(config)
+	service.Start(config, stop)
 	c := make(chan os.Signal)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	go func() {
 		<-c
 		logrus.Info("Shutting Down Cannon....")
 		service.Stop(config)
-		stop<-true
+		stop <- true
 		logrus.Info("Bye!")
 		os.Exit(1)
 	}()
@@ -35,9 +35,9 @@ func GetMetric(config *configs.CannonConfig, stop chan bool) {
 	}
 	for true {
 		time.Sleep(2 * time.Second)
-		service.GetResult(config,id)
+		service.GetResult(config, id)
 		select {
-		case _,_= <-stop:
+		case _, _ = <-stop:
 			return
 		default:
 			continue

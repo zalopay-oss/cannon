@@ -2,6 +2,13 @@ package slave
 
 import (
 	"context"
+	"os"
+	"os/signal"
+	"sync"
+	"sync/atomic"
+	"syscall"
+	"time"
+
 	"github.com/golang/protobuf/proto"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/myzhan/boomer"
@@ -9,12 +16,6 @@ import (
 	"github.com/zalopay-oss/benchmark/generator"
 	"github.com/zalopay-oss/benchmark/generator/parser"
 	"github.com/zalopay-oss/benchmark/utils"
-	"os"
-	"os/signal"
-	"sync"
-	"sync/atomic"
-	"syscall"
-	"time"
 )
 
 var startTest int32 = 0
@@ -47,13 +48,13 @@ func waitForQuit() {
 	wg.Wait()
 }
 
-func (slave *Slave) RunTask() {
+func (slave *Slave) RunTask(waitRun *sync.WaitGroup) {
 	slaveBoomer = boomer.NewBoomer(slave.config.LocustHost, slave.config.LocustPort)
 	var err error
 	md, err, fd = parser.GetMethodDescFromProto(slave.config.Method, slave.config.Proto, []string{})
 
 	if err != nil {
-		utils.Log(logrus.FatalLevel, err, "Error parse protobuf")
+		utils.Log(logrus.FatalLevel, err, "Error read file proto")
 		return
 	}
 
@@ -63,17 +64,20 @@ func (slave *Slave) RunTask() {
 		Fn:     slave.Invoke,
 	}
 
-	boomer.Events.Subscribe("boomer:hatch", func(workers int, hatchRate float64) {
+	if err = boomer.Events.Subscribe("boomer:hatch", func(workers int, hatchRate float64) {
 		err := slave.CreateStubPool(workers)
 		if err != nil {
 			utils.Log(logrus.FatalLevel, err, "Cannot init pool")
 		}
 		atomic.AddInt32(&startTest, 1)
 		logrus.Info("The master asks me to spawn ", workers, " goroutines with a hatch rate of ", int(hatchRate), " per second.")
-	})
+	}); err != nil {
+		utils.Log(logrus.FatalLevel, err, "Subcribe locust fail")
+	}
 
 	logrus.Info("START SLAVE")
 	slaveBoomer.Run(task)
+	waitRun.Done()
 	waitForQuit()
 
 }

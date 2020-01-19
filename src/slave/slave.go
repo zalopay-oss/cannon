@@ -5,20 +5,20 @@ import (
 	"github.com/zalopay-oss/benchmark/configs"
 )
 
-type Slave struct{
-	Pool *StubPool
-	config *configs.SlaveConfig
+type Slave struct {
+	Pool   *StubPool
+	config *configs.CannonConfig
 }
 
-func CreateSlave(config *configs.SlaveConfig) (*Slave,error){
+func CreateSlave(config *configs.CannonConfig) (*Slave, error) {
 	slave := &Slave{
-		config:  config,
+		config: config,
 	}
-	return slave,nil
+	return slave, nil
 }
 
-func (slave *Slave)CreateStubPool(noConns int) error{
-	pool,err := NewStubPool(noConns,slave.config)
+func (slave *Slave) CreateStubPool(noConns int) error {
+	pool, err := NewStubPool(noConns, slave.config)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{"Error": err}).Fatal("Did not create pool")
 		return err

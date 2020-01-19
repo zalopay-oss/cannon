@@ -24,25 +24,26 @@ func GetResult(config *configs.CannonConfig, id []byte) {
 	}
 }
 
-func Start(config *configs.CannonConfig) {
+func Start(config *configs.CannonConfig, stop chan bool) {
 	// TODO: get locust status
 	msg, err := utils.GetLocustStatus(config)
 	if err != nil {
 		utils.Log(logrus.FatalLevel, err, "Fail GetLocustStatus")
 	}
 
-	if msg.State != "stopping" {
+	logrus.Infof("Locust status: %s", msg.State)
+	if msg.State == "stopping" || msg.State == "stopped" || msg.State == "ready" {
 		err = utils.StartLocust(config)
 		if err != nil {
 			utils.Log(logrus.FatalLevel, err, "Fail StartLocust")
 		}
+		if config.IsPersistent {
+			dbClient, _ = influxdb.New(config.DatabaseAddr, config.Token)
+		}
+
+		utils.Log(logrus.InfoLevel, nil, "Start Cannon service success")
 	}
 
-	if config.IsPersistent {
-		dbClient, _ = influxdb.New(config.DatabaseAddr, config.Token)
-	}
-
-	utils.Log(logrus.InfoLevel, nil, "Start Cannon service success")
 }
 
 func Stop(config *configs.CannonConfig) {
