@@ -22,24 +22,26 @@ type SlaveConfig struct {
 
 //CannonConfig struct
 type CannonConfig struct {
-	NoWorkers     int
-	HatchRate     int
+	NoWorkers int
+	HatchRate int
+
 	LocustWebPort string
 	LocustHost    string
 	LocustPort    int
-	DatabaseAddr  string
-	Token         string
-	Measurement   string
-	Bucket        string
-	Origin        string
+
+	IsPersistent bool
+	DatabaseAddr string
+	Token        string
+	Measurement  string
+	Bucket       string
+	Origin       string
 }
 
-
-func LoadDefaultSlaveConfig() error{
+func LoadDefaultSlaveConfig() error {
 	return LoadMyConfig(DefaultSlaveConfiguration)
 }
 
-func LoadDefaultCannonConfig() error{
+func LoadDefaultCannonConfig() error {
 	return LoadMyConfig(DefaultCannonConfiguration)
 }
 
