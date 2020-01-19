@@ -1,0 +1,17 @@
+version: "3"
+services:
+  cannon:
+    build:
+      context: ../src/
+    image: cannon
+    container_name: cannon
+    networks:
+      - cannon-demo
+    volumes:
+      - ./proto:/app/proto/
+      - ./configs/:/app/configs/
+    command: "./cannon run -c /app/configs/config.yaml"
+    # command: "ping localhost"
+    # command: "cat /app/proto/ping.proto"
+networks:
+  cannon-demo:

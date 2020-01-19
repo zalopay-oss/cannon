@@ -1,0 +1,33 @@
+version: "3"
+services:
+  # influxdb:
+  #   ports:
+  #     - 9999:9999
+  #   image: quay.io/influxdb/influxdb:2.0.0-beta
+  #   networks:
+  #     - cannon-demo
+  ping_service:
+    ports:
+      - 9600:9600
+    build:
+      context: pingService
+    image: cannon_ping_service
+    container_name: cannon_ping_service
+    networks:
+      - cannon-demo
+
+  locust:
+    ports:
+      - 8089:8089
+      - 5557:5557
+    image: grubykarol/locust
+    container_name: locust
+    environment:
+      - "ATTACKED_HOST=http://locust:8089"
+      - "LOCUST_MODE=master"
+    networks:
+      - cannon-demo
+    volumes:
+      - ./locust:/locust
+networks:
+  cannon-demo:
