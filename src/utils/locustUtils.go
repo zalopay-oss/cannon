@@ -18,8 +18,8 @@ func checkResponse(resp *http.Response) {
 
 	json.Unmarshal(body, &response)
 
-	if response.Success {
-		Log(logrus.ErrorLevel, nil, "Close test fail: "+response.Message)
+	if !response.Success {
+		Log(logrus.ErrorLevel, nil, "Call fail with msg: "+response.Message)
 	}
 }
 
