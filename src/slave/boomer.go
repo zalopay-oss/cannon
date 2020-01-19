@@ -8,6 +8,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/zalopay-oss/benchmark/generator"
 	"github.com/zalopay-oss/benchmark/generator/parser"
+	"github.com/zalopay-oss/benchmark/utils"
 	"os"
 	"os/signal"
 	"sync"
@@ -47,28 +48,27 @@ func waitForQuit() {
 }
 
 func (slave *Slave) RunTask() {
-	slaveBoomer = boomer.NewBoomer(slave.config.LocustHost,slave.config.LocustPort)
+	slaveBoomer = boomer.NewBoomer(slave.config.LocustHost, slave.config.LocustPort)
 	var err error
-	md, err, fd = parser.GetMethodDescFromProto(slave.config.Method,slave.config.Proto,[]string{})
+	md, err, fd = parser.GetMethodDescFromProto(slave.config.Method, slave.config.Proto, []string{})
 
-	if err!=nil{
-		panic(err)
-		os.Exit(1)
+	if err != nil {
+		utils.Log(logrus.FatalLevel, err, "Error parse protobuf")
+		return
 	}
 
-	task:= &boomer.Task{
-		Name:	slave.config.Method,
+	task := &boomer.Task{
+		Name:   slave.config.Method,
 		Weight: 1,
-		Fn: slave.Invoke,
+		Fn:     slave.Invoke,
 	}
 
 	boomer.Events.Subscribe("boomer:hatch", func(workers int, hatchRate float64) {
 		err := slave.CreateStubPool(workers)
-		if err!=nil{
-			panic(err)
-			os.Exit(1)
+		if err != nil {
+			utils.Log(logrus.FatalLevel, err, "Cannot init pool")
 		}
-		atomic.AddInt32(&startTest,1)
+		atomic.AddInt32(&startTest, 1)
 		logrus.Info("The master asks me to spawn ", workers, " goroutines with a hatch rate of ", int(hatchRate), " per second.")
 	})
 
@@ -80,13 +80,13 @@ func (slave *Slave) RunTask() {
 
 func (slave *Slave) Invoke() {
 	_, err := slave.invoke()
-	if err!=nil{
-		logrus.Fatal(err)
+	if err != nil {
+		logrus.Error("Call target err ", err)
 	}
 }
 
-func (slave *Slave) invoke() (proto.Message, error){
-	for startTest==0{
+func (slave *Slave) invoke() (proto.Message, error) {
+	for startTest == 0 {
 	}
 	ctx := context.Background()
 	call := slave.config.Method
@@ -112,5 +112,5 @@ func (slave *Slave) invoke() (proto.Message, error){
 	} else {
 		slaveBoomer.RecordSuccess("tcp", call, elapsed.Nanoseconds()/int64(time.Millisecond), int64(len(res.String())))
 	}
-	return res,nil
+	return res, nil
 }
