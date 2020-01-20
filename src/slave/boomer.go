@@ -51,11 +51,17 @@ func waitForQuit() {
 func (slave *Slave) RunTask(waitRun *sync.WaitGroup) {
 	slaveBoomer = boomer.NewBoomer(slave.config.LocustHost, slave.config.LocustPort)
 	var err error
+
+	if slave.config.Proto == "" {
+		utils.Log(logrus.FatalLevel, nil, "You must set proto file by flag -p")
+		os.Exit(1)
+	}
+
 	md, err, fd = parser.GetMethodDescFromProto(slave.config.Method, slave.config.Proto, []string{})
 
 	if err != nil {
-		utils.Log(logrus.FatalLevel, err, "Error read file proto ")
-		return
+		utils.Log(logrus.FatalLevel, nil, "Invalid method: "+err.Error()+". Use -m to set methodName")
+		os.Exit(1)
 	}
 
 	task := &boomer.Task{
