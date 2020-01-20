@@ -1,7 +1,10 @@
 package faker
 
 import (
+	"cannon/parser"
+	"cannon/random"
 	"encoding/json"
+	"fmt"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/tranndc/benchmark/generator/parser"
 	"github.com/tranndc/benchmark/generator/random"
@@ -10,7 +13,7 @@ import (
 )
 
 func FakeData(call, inputMessage string, fileDesc *desc.FileDescriptor) (string, error) {
-	_ = random.SetRandomNumberBoundaries(1,100)
+	_ = random.SetRandomNumberBoundaries(1, 100)
 	_ = random.SetRandomStringLength(30)
 	_ = random.SetRandomMapAndSliceSize(5)
 
@@ -18,14 +21,12 @@ func FakeData(call, inputMessage string, fileDesc *desc.FileDescriptor) (string,
 	files[fileDesc.GetName()] = fileDesc
 
 	msgList := fileDesc.GetMessageTypes()
-	svc, _, _  := parser.ParseServiceMethod(call)
+	svc, _, _ := parser.ParseServiceMethod(call)
 	pos := strings.LastIndex(svc, ".")
 	serviceClass := svc[:pos]
 
-	//fmt.Println(serviceClass)
-	// fmt.Println(fileDesc.FindMessage(serviceClass + "." + "MessageResponse.Status"))
 	var jsonStr string = ""
-	for _, msg := range(msgList) {
+	for _, msg := range msgList {
 		if msg.GetName() == inputMessage {
 			structObj := make(map[string]interface{})
 			result := FakeDataForMessage(&structObj, serviceClass, msg, fileDesc)
@@ -43,7 +44,6 @@ func FakeData(call, inputMessage string, fileDesc *desc.FileDescriptor) (string,
 func FakeDataForMessage(objRef *map[string]interface{}, serviceClass string, msg *desc.MessageDescriptor, fileDesc *desc.FileDescriptor) map[string]interface{} {
 	obj := *objRef
 	fields := msg.GetFields()
-	//fmt.Println(fields)
 
 	// Get one field in OneOf
 	oneOfFields := getOneOfNamesList(msg)
@@ -52,23 +52,19 @@ func FakeDataForMessage(objRef *map[string]interface{}, serviceClass string, msg
 	nestedMsgList := msg.GetNestedMessageTypes()
 	nestedMsgNames := make(map[string]int)
 	if nestedMsgList != nil && len(nestedMsgList) > 0 {
-		for _, nst := range(nestedMsgList) {
-			//fmt.Println(nst.GetName())
+		for _, nst := range nestedMsgList {
 			nestedMsgNames[nst.GetName()] = 1
 		}
 	}
 
-	for _, f := range(fields) {
-		//fmt.Println(f)
-		//fmt.Println(f)
-		//fmt.Println(f.GetType().String())
+	for _, f := range fields {
 		msgType := f.GetType().String()
 		label := f.GetLabel().String()
+		// Check if a field is a candidate field in oneof
 		if !checkInOneOfList(f.GetName(), oneOfFields) && f.GetOneOf() != nil {
 			continue
 		}
 		if msgType == "TYPE_ENUM" {
-			// fmt.Println(f.GetEnumType().GetName())
 			obj[f.GetName()] = getValueForEnum(f, serviceClass, fileDesc)
 		} else if label == "LABEL_REPEATED" && msgType == "TYPE_MESSAGE" {
 			nestedMsg := f.GetMessageType()
@@ -90,7 +86,6 @@ func FakeDataForMessage(objRef *map[string]interface{}, serviceClass string, msg
 
 func getValueNestedFields(field *desc.FieldDescriptor, serviceClass string, fileDesc *desc.FileDescriptor) interface{} {
 	msg := field.GetMessageType()
-	// nestedMsgs := msg.GetNestedMessageTypes()
 
 	// If it is a map type
 	if msg.GetMessageOptions().GetMapEntry() {
@@ -99,7 +94,7 @@ func getValueNestedFields(field *desc.FieldDescriptor, serviceClass string, file
 		valType := field.GetMapValueType()
 		mapObj := make(map[string]interface{})
 
-		for i:=0; i < mapLen; i++ {
+		for i := 0; i < mapLen; i++ {
 			keyVal := getValueNormalFields(keyType, msg, serviceClass, fileDesc)
 			valVal := getValueNormalFields(valType, msg, serviceClass, fileDesc)
 			mapObj[keyVal.(string)] = valVal
@@ -123,14 +118,13 @@ func getValueNormalFields(
 	if msg != nil {
 		nestedMsgList := msg.GetNestedMessageTypes()
 		if nestedMsgList != nil && len(nestedMsgList) > 0 {
-			for _, nst := range(nestedMsgList) {
+			for _, nst := range nestedMsgList {
 				nestedMsgNames[nst.GetName()] = 1
 			}
 		}
 	}
-	msgType := field.GetType().String()
 
-	// fmt.Println(f)
+	msgType := field.GetType().String()
 	fieldType := field.GetType().String()
 	label := field.GetLabel().String()
 
@@ -148,18 +142,16 @@ func getValueNormalFields(
 		}
 	} else if label == "LABEL_REPEATED" {
 		objList := getValueForList(fieldType, field, serviceClass, fileDesc)
-		// fmt.Println(objList)
 		return objList
 	} else if fieldType == "TYPE_MESSAGE" {
-		// childObj := make(map[string]interface{})
 		m := fileDesc.FindMessage(serviceClass + "." + field.GetMessageType().GetName())
 		fieldList := m.GetFields()
 		if m != nil {
 			msgValue := make(map[string]interface{})
-			for _, field := range(fieldList) {
+			for _, field := range fieldList {
 				// Get one field in OneOf
 				oneOfFields := getOneOfNamesList(msg)
-				if !checkInOneOfList(field.GetName(), oneOfFields) && field.GetOneOf() != nil{
+				if !checkInOneOfList(field.GetName(), oneOfFields) && field.GetOneOf() != nil {
 					continue
 				}
 				msgValue[field.GetName()] = getValueNormalFields(field, m, serviceClass, fileDesc)
@@ -168,7 +160,6 @@ func getValueNormalFields(
 		}
 	} else if label == "LABEL_OPTIONAL" {
 		value := assignValueScalaType(fieldType)
-		// fmt.Println(value)
 		return value
 	}
 	return nil
@@ -177,15 +168,16 @@ func getValueNormalFields(
 func getValueForList(msgType string, f *desc.FieldDescriptor, serviceClass string, fileDesc *desc.FileDescriptor) []interface{} {
 	listType := f.GetType().String()
 	numObjs := random.RandomSliceAndMapSize()
-	// fmt.Println(numObjs)
+
 	objList := make([]interface{}, numObjs)
+
 	if listType == "TYPE_MESSAGE" {
 		m := fileDesc.FindMessage(serviceClass + "." + f.GetMessageType().GetName())
 		if m != nil {
 			fieldList := m.GetFields()
 			for i := 0; i < numObjs; i++ {
 				eleObj := make(map[string]interface{})
-				for _, field := range(fieldList) {
+				for _, field := range fieldList {
 					oneOfFields := getOneOfNamesList(m)
 					if !checkInOneOfList(field.GetName(), oneOfFields) && field.GetOneOf() != nil {
 						continue
@@ -197,7 +189,7 @@ func getValueForList(msgType string, f *desc.FieldDescriptor, serviceClass strin
 			}
 		}
 	} else {
-		for i:=0; i < numObjs; i++ {
+		for i := 0; i < numObjs; i++ {
 			element := assignValueScalaType(msgType)
 			objList[i] = element
 		}
@@ -206,16 +198,16 @@ func getValueForList(msgType string, f *desc.FieldDescriptor, serviceClass strin
 }
 
 func getValueForEnum(field *desc.FieldDescriptor, serviceClass string, fileDesc *desc.FileDescriptor) int {
-	//fmt.Println(field.GetEnumType().GetName())
+	fmt.Println(field.GetEnumType().GetName())
 	enumMsg := fileDesc.FindEnum(serviceClass + "." + field.GetEnumType().GetName())
 	enumLen := len(enumMsg.GetValues())
-	bound := random.NumberBoundary{Start: 1, End: enumLen}
+	bound := random.NumberBoundary{Start: 0, End: enumLen}
 	enumVal := random.RandomIntegerWithBoundary(bound)
 	return enumVal
 }
 
 func checkInOneOfList(fieldName string, oneOfList []string) bool {
-	for _, oneOfName := range(oneOfList) {
+	for _, oneOfName := range oneOfList {
 		if oneOfName == fieldName {
 			return true
 		}
@@ -226,29 +218,13 @@ func checkInOneOfList(fieldName string, oneOfList []string) bool {
 func getOneOfNamesList(msg *desc.MessageDescriptor) []string {
 	oneOfs := msg.GetOneOfs()
 	var oneOfFields []string
-	for _, oneOf := range(oneOfs) {
+	for _, oneOf := range oneOfs {
 		choices := oneOf.GetChoices()
 		choiceIdx := random.RandomIntegerWithBoundary(random.NumberBoundary{Start: 0, End: len(choices)})
 		oneOfFields = append(oneOfFields, choices[choiceIdx].GetName())
 	}
 	return oneOfFields
 }
-
-//func getValueForKVInMap(field *desc.FieldDescriptor) []interface{} {
-//	msg := field.GetMessageType()
-//	nestedMsgList := msg.GetNestedMessageTypes()
-//	fieldType := field.GetType().String()
-//	label := field.GetLabel().String()
-//
-//	nestedMsgNames := make(map[string]int)
-//	if nestedMsgList != nil && len(nestedMsgList) > 0 {
-//		for _, nst := range(nestedMsgList) {
-//			nestedMsgNames[nst.GetName()] = 1
-//		}
-//	}
-//
-//
-//}
 
 func assignValueScalaType(msgType string) interface{} {
 	var value interface{}
@@ -279,6 +255,8 @@ func assignValueScalaType(msgType string) interface{} {
 		value = rand.Float64()
 	case "TYPE_BOOL":
 		value = rand.Intn(2) > 0
+	case "TYPE_BYTES":
+		value = random.RandomBytesData()
 	default:
 		value = nil
 	}

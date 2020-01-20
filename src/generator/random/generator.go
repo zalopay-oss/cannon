@@ -132,3 +132,9 @@ func RandomInt(parameters ...int) (p []int, err error) {
 	}
 	return p, err
 }
+
+func RandomBytesData() string {
+	data := RandomString()
+	b64Data := base64.StdEncoding.EncodeToString([]byte(data))
+	return b64Data
+}
