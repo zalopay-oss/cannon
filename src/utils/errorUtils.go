@@ -37,6 +37,12 @@ func Log(level logrus.Level, err error, msg string) {
 	}
 }
 
+func PrintBanner(msg string) {
+	logrus.Info("====================")
+	logrus.Info(msg)
+	logrus.Info("====================")
+}
+
 func getStackTrace() string {
 	stackBuf := make([]uintptr, maxStackLength)
 	length := runtime.Callers(3, stackBuf[:])

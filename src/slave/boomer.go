@@ -4,6 +4,7 @@ import (
 	"context"
 	"os"
 	"os/signal"
+	"strconv"
 	"sync"
 	"sync/atomic"
 	"syscall"
@@ -42,7 +43,7 @@ func waitForQuit() {
 		if !quitByMe {
 			wg.Done()
 		}
-		logrus.Info("STOP SLAVE")
+		utils.PrintBanner("STOP SLAVE")
 	})
 
 	wg.Wait()
@@ -81,7 +82,7 @@ func (slave *Slave) RunTask(waitRun *sync.WaitGroup) {
 		utils.Log(logrus.FatalLevel, err, "Subcribe locust fail")
 	}
 
-	logrus.Info("START SLAVE")
+	utils.PrintBanner("START SLAVE attack " + slave.config.GRPCHost + ":" + strconv.Itoa(slave.config.GRPCPort))
 	slaveBoomer.Run(task)
 	waitRun.Done()
 	waitForQuit()
