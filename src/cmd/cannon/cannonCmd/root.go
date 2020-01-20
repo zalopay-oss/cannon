@@ -63,20 +63,20 @@ func initFlags() {
 
 	// init flags
 	// master
-	masterCmd.PersistentFlags().IntVarP(&cannonConfig.HatchRate, "hatchRate", "r", cannonConfig.HatchRate, "config Hatch rate (users spawned/second)")
-	masterCmd.PersistentFlags().IntVarP(&cannonConfig.NoWorkers, "no-workers", "w", cannonConfig.NoWorkers, "Number of workers to simulate")
-	masterCmd.PersistentFlags().StringVarP(&cannonConfig.ConfigFile, "config", "c", "", "Config file")
+	masterCmd.PersistentFlags().IntVarP(&cannonConfig.HatchRate, "hatchRate", "r", cannonConfig.HatchRate, "config hatch rate (users spawned/second)")
+	masterCmd.PersistentFlags().IntVarP(&cannonConfig.NoWorkers, "no-workers", "w", cannonConfig.NoWorkers, "number of workers to simulate")
+	masterCmd.PersistentFlags().StringVarP(&cannonConfig.ConfigFile, "config", "c", "", "path of config file")
 
 	// slave
-	masterCmd.PersistentFlags().StringVarP(&cannonConfig.Method, "method", "m", cannonConfig.Method, "Method name")
-	masterCmd.PersistentFlags().StringVarP(&cannonConfig.Proto, "proto", "p", cannonConfig.Proto, "Proto File")
-	masterCmd.PersistentFlags().StringVarP(&cannonConfig.GRPCHost, "host", "H", cannonConfig.GRPCHost, "Target gRPC host")
-	masterCmd.PersistentFlags().IntVarP(&cannonConfig.GRPCPort, "port", "P", cannonConfig.GRPCPort, "Target gRPC port")
+	masterCmd.PersistentFlags().StringVarP(&cannonConfig.Method, "method", "m", cannonConfig.Method, "method name")
+	masterCmd.PersistentFlags().StringVarP(&cannonConfig.Proto, "proto", "p", cannonConfig.Proto, "path of proto file")
+	masterCmd.PersistentFlags().StringVarP(&cannonConfig.GRPCHost, "host", "H", cannonConfig.GRPCHost, "target gRPC host")
+	masterCmd.PersistentFlags().IntVarP(&cannonConfig.GRPCPort, "port", "P", cannonConfig.GRPCPort, "target gRPC port")
 
 	// locust
-	masterCmd.PersistentFlags().StringVar(&cannonConfig.LocustHost, "locust-host", cannonConfig.LocustHost, "Host of Locust Master")
-	masterCmd.PersistentFlags().IntVar(&cannonConfig.LocustPort, "locust-port", cannonConfig.LocustPort, "Port of Locust Master")
-	masterCmd.PersistentFlags().StringVar(&cannonConfig.LocustWebTarget, "locust-web", cannonConfig.LocustWebTarget, "Locust Web Target")
+	masterCmd.PersistentFlags().StringVar(&cannonConfig.LocustHost, "locust-host", cannonConfig.LocustHost, "host of locust master")
+	masterCmd.PersistentFlags().IntVar(&cannonConfig.LocustPort, "locust-port", cannonConfig.LocustPort, "port of locust master")
+	masterCmd.PersistentFlags().StringVar(&cannonConfig.LocustWebTarget, "locust-web", cannonConfig.LocustWebTarget, "locust web target")
 }
 
 func Execute() {
