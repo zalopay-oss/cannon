@@ -2,10 +2,9 @@ package faker
 
 import (
 	"encoding/json"
-	"fmt"
-	"github.com/jhump/protoreflect/desc"
 	"math/rand"
 	"strings"
+
 	"github.com/jhump/protoreflect/desc"
 	"github.com/zalopay-oss/benchmark/generator/parser"
 	"github.com/zalopay-oss/benchmark/generator/random"

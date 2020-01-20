@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"math/rand"
+	"encoding/base64"
 )
 
 type NumberBoundary struct {
