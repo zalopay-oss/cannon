@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+// options for Java generated sources
+option java_multiple_files = true;
+option java_package = "com.zalopay.oss.cannon.ping.service";
+option java_outer_classname = "PingService";
+option go_package = "ping";
+
+package ping;
+
+message PingRequest {
+    int64 timestamp = 1;
+}
+
+message PingResponse {
+    int64 timestamp = 1;
+    string message = 2;
+}
+
+service PingService {
+    rpc Ping (PingRequest) returns (PingResponse);
+}

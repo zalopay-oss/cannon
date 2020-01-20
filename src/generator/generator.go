@@ -6,8 +6,7 @@ import (
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/dynamic"
-	"github.com/tranndc/benchmark/generator/faker"
-	"github.com/tranndc/benchmark/generator/parser"
+	"github.com/zalopay-oss/benchmark/generator/faker"
 	"strings"
 )
 
@@ -65,12 +64,10 @@ func createPayloadsFromJSON(data string, mtd *desc.MethodDescriptor) ([]*dynamic
 	return inputs, nil
 }
 
-func GetInput(proto string, service string)([]*dynamic.Message, *desc.MethodDescriptor, error){
-	md, err, fileDesc := parser.GetMethodDescFromProto(service, proto, []string{})
+func GetInput(service string, md *desc.MethodDescriptor, fileDesc *desc.FileDescriptor)([]*dynamic.Message, *desc.MethodDescriptor, error){
 	inputTypeName := md.GetInputType().GetName()
 	jsonStr, err := faker.FakeData(service, inputTypeName, fileDesc)
-	fmt.Println(jsonStr)
-	
+
 	if err != nil {
 		return nil,nil, err
 	}

@@ -4,12 +4,19 @@ import (
 	"cannon/parser"
 	"cannon/random"
 	"encoding/json"
+<<<<<<< HEAD
 	"fmt"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/tranndc/benchmark/generator/parser"
 	"github.com/tranndc/benchmark/generator/random"
+=======
+>>>>>>> 2e2d9b769f3144bfae1a6ac7cae5ed23a7b1c71b
 	"math/rand"
 	"strings"
+
+	"github.com/jhump/protoreflect/desc"
+	"github.com/zalopay-oss/benchmark/generator/parser"
+	"github.com/zalopay-oss/benchmark/generator/random"
 )
 
 func FakeData(call, inputMessage string, fileDesc *desc.FileDescriptor) (string, error) {
@@ -198,7 +205,10 @@ func getValueForList(msgType string, f *desc.FieldDescriptor, serviceClass strin
 }
 
 func getValueForEnum(field *desc.FieldDescriptor, serviceClass string, fileDesc *desc.FileDescriptor) int {
+<<<<<<< HEAD
 	fmt.Println(field.GetEnumType().GetName())
+=======
+>>>>>>> 2e2d9b769f3144bfae1a6ac7cae5ed23a7b1c71b
 	enumMsg := fileDesc.FindEnum(serviceClass + "." + field.GetEnumType().GetName())
 	enumLen := len(enumMsg.GetValues())
 	bound := random.NumberBoundary{Start: 0, End: enumLen}

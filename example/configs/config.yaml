@@ -1,0 +1,18 @@
+LocustWebTarget: "http://locust:8089/"
+LocustHost: "locust"
+LocustPort: 5557
+
+NoWorkers: 800
+HatchRate: 10
+
+IsPersistent: "false"
+DatabaseAddr: "http://0.0.0.0:9999"
+Token: "egc6_K6V0pCmEwIahIzm9i52ommTcsa7TS5XtmcSBnR9VeX31dMsRJ_STN-bUqOwWW77vPiU0aM9RGMQFwxT-A=="
+Bucket: "benchmark-results"
+Origin: "tranndc"
+
+GRPCPort: 9600
+GRPCHost: "cannon_ping_service"
+
+Method: "ping.PingService.Ping"
+Proto: "./proto/ping.proto"

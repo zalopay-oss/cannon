@@ -2,72 +2,119 @@ package slave
 
 import (
 	"context"
+	"os"
+	"os/signal"
+	"sync"
+	"sync/atomic"
+	"syscall"
+	"time"
+
 	"github.com/golang/protobuf/proto"
+	"github.com/jhump/protoreflect/desc"
 	"github.com/myzhan/boomer"
 	"github.com/sirupsen/logrus"
-	"github.com/tranndc/benchmark/configs"
-	"github.com/tranndc/benchmark/generator"
+	"github.com/zalopay-oss/benchmark/generator"
+	"github.com/zalopay-oss/benchmark/generator/parser"
+	"github.com/zalopay-oss/benchmark/utils"
 )
 
+var startTest int32 = 0
 
+var slaveBoomer *boomer.Boomer
+var md *desc.MethodDescriptor
+var fd *desc.FileDescriptor
 
-func RunTask(slave *Slave, config *configs.ServiceConfig, done chan bool){
-	var count = make(chan bool)
+func waitForQuit() {
+	wg := sync.WaitGroup{}
+	wg.Add(1)
 
-	task:= &boomer.Task{
-		Name:	config.Service,
-		Weight: 1,
-		Fn: slave.Invoke,
-	}
+	quitByMe := false
+	go func() {
+		c := make(chan os.Signal)
+		signal.Notify(c, syscall.SIGINT, syscall.SIGTERM)
+		<-c
+		quitByMe = true
+		slaveBoomer.Quit()
+		wg.Done()
+	}()
 
-
-	boomer.Events.Subscribe("boomer:hatch", func(workers int, hatchRate float64) {
-		logrus.Info("The master asks me to spawn ", workers, " goroutines with a hatch rate of", int(hatchRate), "per second.")
+	_ = boomer.Events.Subscribe("boomer:quit", func() {
+		if !quitByMe {
+			wg.Done()
+		}
+		logrus.Info("STOP SLAVE")
 	})
 
-	boomer.Events.Subscribe("boomer:quit", func() {
-		logrus.Info("Boomer is quitting now.")
-	})
-
-	logrus.Info("START SLAVE")
-	boomer.Run(task)
-
-	done <- true
-	count <- true
+	wg.Wait()
 }
 
-func (slave Slave) Invoke() {
-	_, err := slave.invoke(slave.config.Service, slave.config.Proto)
-	if err!=nil{
-		logrus.Fatal(err)
-	}
-}
-
-
-func (slave Slave) invoke(call string , proto string) (proto.Message, error){
-	ctx := context.Background()
-	inputs, md, err := generator.GetInput(proto, call)
+func (slave *Slave) RunTask(waitRun *sync.WaitGroup) {
+	slaveBoomer = boomer.NewBoomer(slave.config.LocustHost, slave.config.LocustPort)
+	var err error
+	md, err, fd = parser.GetMethodDescFromProto(slave.config.Method, slave.config.Proto, []string{})
 
 	if err != nil {
-		logrus.Error("Error creating client connection: %+v", err.Error())
+		utils.Log(logrus.FatalLevel, err, "Error read file proto ")
+		return
+	}
+
+	task := &boomer.Task{
+		Name:   slave.config.Method,
+		Weight: 1,
+		Fn:     slave.Invoke,
+	}
+
+	if err = boomer.Events.Subscribe("boomer:hatch", func(workers int, hatchRate float64) {
+		err := slave.CreateStubPool(workers)
+		if err != nil {
+			utils.Log(logrus.FatalLevel, err, "Cannot init pool")
+		}
+		atomic.AddInt32(&startTest, 1)
+		logrus.Info("The master asks me to spawn ", workers, " goroutines with a hatch rate of ", int(hatchRate), " per second.")
+	}); err != nil {
+		utils.Log(logrus.FatalLevel, err, "Subcribe locust fail")
+	}
+
+	logrus.Info("START SLAVE")
+	slaveBoomer.Run(task)
+	waitRun.Done()
+	waitForQuit()
+
+}
+
+func (slave *Slave) Invoke() {
+	_, err := slave.invoke()
+	if err != nil {
+		logrus.Error("Call target err ", err)
+	}
+}
+
+func (slave *Slave) invoke() (proto.Message, error) {
+	for startTest == 0 {
+	}
+	ctx := context.Background()
+	call := slave.config.Method
+	inputs, md, err := generator.GetInput(call, md, fd)
+
+	if err != nil {
+		logrus.Error("Error creating client connection: %v", err.Error())
 		return nil, err
 	}
-	start := boomer.Now()
-
+	start := time.Now()
 	stub, err := slave.Pool.Get()
 	if err != nil {
 		logrus.Error("Error getting stub: %v", err.Error())
 		return nil, err
 	}
 	res, err := stub.InvokeRpc(ctx, md, inputs[0])
-	elapsed := boomer.Now() - start
+	elapsed := time.Since(start)
 
 	if err != nil {
 		logrus.Error("Error InvokeRpc: %v", err.Error())
-		boomer.RecordFailure("tcp", call+" fail", elapsed, err.Error())
+		slaveBoomer.RecordFailure("tcp", call, elapsed.Nanoseconds()/int64(time.Millisecond), err.Error())
 		return nil, err
 	} else {
-		boomer.RecordSuccess("tcp", call, elapsed, int64(len(res.String())))
+		slaveBoomer.RecordSuccess("tcp", call, elapsed.Nanoseconds()/int64(time.Millisecond), int64(len(res.String())))
 	}
-	return res,nil
+	return res, nil
 }
