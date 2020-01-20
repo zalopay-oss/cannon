@@ -2,9 +2,7 @@
 
 ## Run with docker
 
-### Requirement
-
-You must install:
+Requirement (go to the next step, if you already have):
 
 - [docker](https://docs.docker.com/install/)
 - docker-compose
