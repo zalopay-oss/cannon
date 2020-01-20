@@ -1,5 +1,5 @@
 ARG alpine_version=3.11
-FROM golang:1.12.14-alpine$alpine_version AS build
+FROM golang:1.13.6-alpine$alpine_version AS build
 
 RUN apk add --update --no-cache git
 WORKDIR /app
