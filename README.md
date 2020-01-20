@@ -1,8 +1,8 @@
-# Zalopay Cannon v0.1.1
+# ZaloPay Cannon
 
 ![version](https://img.shields.io/badge/version-0.1.1-red) [![issues](https://img.shields.io/badge/open%20issues-0-orange)]() [![contributors](https://img.shields.io/badge/contributors-3-blue)]()
 
-![logo](images/cannon-logo.jpg)
+<img src="images/cannon-logo.jpg" alt="logo" width="600"/>
 
 ## Introduction
 
@@ -27,9 +27,27 @@ ZaloPay Cannon is a benchmark system for ZaloPay's internal service. The aim is 
 - Influxdb 2.0
 - Python 3.7.3  
 
-## Configuration
+## Usage
 
-### Cannon Config
+- Make sure Locust, InfluxDB and gRPC server are running.
+
+```bash
+Usage:
+  cannon run [flags]
+
+Flags:
+  -c, --config string   Config file (default "")
+      --host string     Config target host (default "localhost")
+      --port int        Config gRPC port (default 5557)
+  -p, --proto string    Proto File (default "./ping.proto")
+  -m, --method string   Method name (default "ping.PingService.ping")
+  -r, --hatchRate int    config Hatch rate (users spawned/second) (default 10)
+  -w, --no-workers int   Number of workers to simulate (default 800)
+  -h, --help            help for run
+
+```
+
+- Cannon example config file
 
 ```yaml
 # Locust Config
@@ -51,26 +69,6 @@ GRPCHost: "localhost"
 GRPCPort: 4770
 Proto: "./proto-name.proto"
 Method: "serviceName.methodName"
-```
-
-## Usage
-
-- Make sure Locust, InfluxDB and gRPC server are running.
-
-```bash
-Usage:
-  cannon run [flags]
-
-Flags:
-  -c, --config string   Config file (default "")
-      --host string     Config target host (default "localhost")
-      --port int        Config gRPC port (default 5557)
-  -p, --proto string    Proto File (default "./ping.proto")
-  -m, --method string   Method name (default "ping.PingService.ping")
-  -r, --hatchRate int    config Hatch rate (users spawned/second) (default 10)
-  -w, --no-workers int   Number of workers to simulate (default 800)
-  -h, --help            help for run
-
 ```
 
 ## Example
