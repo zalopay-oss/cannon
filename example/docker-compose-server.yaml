@@ -1,11 +1,6 @@
 version: "3"
 services:
-  # influxdb:
-  #   ports:
-  #     - 9999:9999
-  #   image: quay.io/influxdb/influxdb:2.0.0-beta
-  #   networks:
-  #     - cannon-demo
+  # backend: ping service
   ping_service:
     ports:
       - 9600:9600
@@ -16,6 +11,7 @@ services:
     networks:
       - cannon-demo
 
+  # locust
   locust:
     ports:
       - 8089:8089
@@ -29,5 +25,13 @@ services:
       - cannon-demo
     volumes:
       - ./locust:/locust
+
+  # influxDB
+  influxdb:
+    ports:
+      - 9999:9999
+    image: quay.io/influxdb/influxdb:2.0.0-beta
+    networks:
+      - cannon-demo
 networks:
   cannon-demo:

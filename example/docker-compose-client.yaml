@@ -11,7 +11,5 @@ services:
       - ./proto:/app/proto/
       - ./configs/:/app/configs/
     command: "./cannon run -c /app/configs/config.yaml"
-    # command: "ping localhost"
-    # command: "cat /app/proto/ping.proto"
 networks:
   cannon-demo:

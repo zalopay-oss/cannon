@@ -25,4 +25,4 @@ RUN apk add --no-cache util-linux
 
 EXPOSE 7000
 
-CMD ["./cannon -c /app/configs/config.yaml"]
+CMD ["./cannon run -c ./configs/config.yaml"]
