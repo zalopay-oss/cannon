@@ -1,6 +1,6 @@
 # Zalopay Cannon v0.1.1
 
-![version](https://img.shields.io/badge/version-0.1.1-red) [![issues](https://img.shields.io/badge/open%20issues-0-orange)]() [![contributors](https://img.shields.io/badge/contributors-2-blue)]()
+![version](https://img.shields.io/badge/version-0.1.1-red) [![issues](https://img.shields.io/badge/open%20issues-0-orange)]() [![contributors](https://img.shields.io/badge/contributors-3-blue)]()
 
 ## Introduction
 
@@ -78,3 +78,8 @@ Read the [example](example/README.md)
 ## Roadmap
 
 Read the [roadmap](docs/ROADMAP.md)
+
+## Acknowledgements
+
+- Thanks to @anhld2, which served as an inspiration and guide in building this project.
+- Special thanks to @thinhda, @tranndc and @quyenpt for their work on making component-based theming a reality.
