@@ -1,4 +1,4 @@
-# Zalopay Cannon v0.1.1
+# ZaloPay Cannon
 
 ![version](https://img.shields.io/badge/version-0.1.1-red) [![issues](https://img.shields.io/badge/open%20issues-0-orange)]() [![contributors](https://img.shields.io/badge/contributors-3-blue)]()
 
