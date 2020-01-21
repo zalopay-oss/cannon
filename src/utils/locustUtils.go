@@ -129,7 +129,7 @@ func GetLocustStatus(config *configs.CannonConfig) (*model.LocustStatus, error) 
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		Log(logrus.FatalLevel, err, "Cannot connect locustWebTarget:"+config.LocustWebTarget)
+		Log(logrus.FatalLevel, err, "Cannot connect "+config.LocustWebTarget)
 	}
 	defer resp.Body.Close()
 

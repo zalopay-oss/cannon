@@ -4,6 +4,7 @@ import (
 	"context"
 	"os"
 	"os/signal"
+	"strconv"
 	"sync"
 	"sync/atomic"
 	"syscall"
@@ -42,7 +43,7 @@ func waitForQuit() {
 		if !quitByMe {
 			wg.Done()
 		}
-		logrus.Info("STOP SLAVE")
+		utils.PrintBanner("STOP SLAVE")
 	})
 
 	wg.Wait()
@@ -51,11 +52,17 @@ func waitForQuit() {
 func (slave *Slave) RunTask(waitRun *sync.WaitGroup) {
 	slaveBoomer = boomer.NewBoomer(slave.config.LocustHost, slave.config.LocustPort)
 	var err error
+
+	if slave.config.Proto == "" {
+		utils.Log(logrus.FatalLevel, nil, "You must set proto file")
+		os.Exit(1)
+	}
+
 	md, err, fd = parser.GetMethodDescFromProto(slave.config.Method, slave.config.Proto, []string{})
 
 	if err != nil {
-		utils.Log(logrus.FatalLevel, err, "Error read file proto ")
-		return
+		utils.Log(logrus.FatalLevel, nil, "Invalid method: "+err.Error()+". Use -m to set methodName")
+		os.Exit(1)
 	}
 
 	task := &boomer.Task{
@@ -75,7 +82,7 @@ func (slave *Slave) RunTask(waitRun *sync.WaitGroup) {
 		utils.Log(logrus.FatalLevel, err, "Subcribe locust fail")
 	}
 
-	logrus.Info("START SLAVE")
+	utils.PrintBanner("START SLAVE attack " + slave.config.GRPCHost + ":" + strconv.Itoa(slave.config.GRPCPort))
 	slaveBoomer.Run(task)
 	waitRun.Done()
 	waitForQuit()
@@ -83,10 +90,7 @@ func (slave *Slave) RunTask(waitRun *sync.WaitGroup) {
 }
 
 func (slave *Slave) Invoke() {
-	_, err := slave.invoke()
-	if err != nil {
-		logrus.Error("Call target err ", err)
-	}
+	_, _ = slave.invoke()
 }
 
 func (slave *Slave) invoke() (proto.Message, error) {
@@ -110,7 +114,7 @@ func (slave *Slave) invoke() (proto.Message, error) {
 	elapsed := time.Since(start)
 
 	if err != nil {
-		logrus.Error("Error InvokeRpc: %v", err.Error())
+		logrus.Error("Error call service: %v", err.Error())
 		slaveBoomer.RecordFailure("tcp", call, elapsed.Nanoseconds()/int64(time.Millisecond), err.Error())
 		return nil, err
 	} else {

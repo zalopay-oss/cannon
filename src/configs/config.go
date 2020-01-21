@@ -36,7 +36,7 @@ func NewDefaultCannonConfig() *CannonConfig {
 		NoWorkers: 10,
 		HatchRate: 10,
 
-		LocustWebTarget: "http://0.0.0.0:8089/",
+		LocustWebTarget: "http://localhost:8089",
 		LocustHost:      "localhost",
 		LocustPort:      5557,
 
@@ -49,8 +49,8 @@ func NewDefaultCannonConfig() *CannonConfig {
 
 		GRPCHost: "localhost",
 		GRPCPort: 8000,
-		Method:   "transRecord",
-		Proto:    "transaction.proto",
+		Method:   "",
+		Proto:    "",
 	}
 }
 
