@@ -6,7 +6,7 @@
 
 ## Introduction
 
-ZaloPay Cannon is a benchmark system for ZaloPay's internal services. The aim is to build a multi-tennant system which provides intuitive UI/UX for users to submit tasks and perform benchmark.  
+ZaloPay Cannon is a benchmark system for ZaloPay's internal services. The aim is to build a multi-tenant system which provides intuitive UI/UX for users to submit tasks and perform benchmark.  
 
 ## Architecture
 
@@ -74,6 +74,7 @@ Proto: "./proto-name.proto"
 Method: "serviceName.methodName"
 ```
 
+- You can start `multiple instances of cannon` to benchmark in `distributed mode`.
 - Monitor at dashboard locust
 
 <img src="images/dashboard-example.png" alt="logo" width="800"/>
