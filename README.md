@@ -90,4 +90,4 @@ Read the [roadmap](docs/ROADMAP.md)
 ## Acknowledgements
 
 - Thanks to @anhld2, which served as an inspiration and guide in building this project.
-- Special thanks to @thinhda, @tranndc and @quyenpt for their work on making component-based theming a reality.
+- Special thanks to @thinhda, @tranndc and @quyenpt3 for their work on making component-based theming a reality.
