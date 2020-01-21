@@ -1,6 +1,22 @@
-version: "3"
+version: "3.7"
+
+x-node: &default-node
+  build:
+    context: ../src/
+  image: cannon
+
+  networks:
+    - cannon-demo
+  volumes:
+    - ./proto:/app/proto/
+    - ./configs/:/app/configs/
+  command: "./cannon run -c /app/configs/config.yaml"
+  restart: on-failure
+  depends_on:
+    - locust
+    - ping_service
+
 services:
-  # backend: ping service
   ping_service:
     ports:
       - 9600:9600
@@ -11,7 +27,6 @@ services:
     networks:
       - cannon-demo
 
-  # locust
   locust:
     ports:
       - 8089:8089
@@ -26,27 +41,21 @@ services:
     volumes:
       - ./locust:/locust
 
-  cannon:
-    build:
-      context: ../src/
-    image: cannon
-    container_name: cannon
-    networks:
-      - cannon-demo
-    volumes:
-      - ./proto:/app/proto/
-      - ./configs/:/app/configs/
-    command: "./cannon run -c /app/configs/config.yaml"
-    depends_on:
-      - locust
-      - ping_service
+  # You need configuration user at dashboard: localhost:9999
+  # influxdb:
+  #   ports:
+  #     - 9999:9999
+  #   image: quay.io/influxdb/influxdb:2.0.0-beta
+  #   networks:
+  #     - cannon-demo
 
-  # influxDB
-  influxdb:
-    ports:
-      - 9999:9999
-    image: quay.io/influxdb/influxdb:2.0.0-beta
-    networks:
-      - cannon-demo
+  cannon:
+    <<: *default-node
+    container_name: cannon
+
+  cannon1:
+    <<: *default-node
+    container_name: cannon1
+
 networks:
   cannon-demo:

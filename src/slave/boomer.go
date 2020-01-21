@@ -54,7 +54,7 @@ func (slave *Slave) RunTask(waitRun *sync.WaitGroup) {
 	var err error
 
 	if slave.config.Proto == "" {
-		utils.Log(logrus.FatalLevel, nil, "You must set proto file by flag -p")
+		utils.Log(logrus.FatalLevel, nil, "You must set proto file")
 		os.Exit(1)
 	}
 
@@ -90,10 +90,7 @@ func (slave *Slave) RunTask(waitRun *sync.WaitGroup) {
 }
 
 func (slave *Slave) Invoke() {
-	_, err := slave.invoke()
-	if err != nil {
-		logrus.Error("Call target err ", err)
-	}
+	_, _ = slave.invoke()
 }
 
 func (slave *Slave) invoke() (proto.Message, error) {
@@ -117,7 +114,7 @@ func (slave *Slave) invoke() (proto.Message, error) {
 	elapsed := time.Since(start)
 
 	if err != nil {
-		logrus.Error("Error InvokeRpc: %v", err.Error())
+		logrus.Error("Error call service: %v", err.Error())
 		slaveBoomer.RecordFailure("tcp", call, elapsed.Nanoseconds()/int64(time.Millisecond), err.Error())
 		return nil, err
 	} else {

@@ -65,7 +65,7 @@ func initFlags() {
 	// master
 	masterCmd.PersistentFlags().IntVarP(&cannonConfig.HatchRate, "hatchRate", "r", cannonConfig.HatchRate, "config hatch rate (users spawned/second)")
 	masterCmd.PersistentFlags().IntVarP(&cannonConfig.NoWorkers, "no-workers", "w", cannonConfig.NoWorkers, "number of workers to simulate")
-	masterCmd.PersistentFlags().StringVarP(&cannonConfig.ConfigFile, "config", "c", "", "path of config file")
+	masterCmd.PersistentFlags().StringVarP(&configFile, "config", "c", "", "path of config file")
 
 	// slave
 	masterCmd.PersistentFlags().StringVarP(&cannonConfig.Method, "method", "m", cannonConfig.Method, "method name")
