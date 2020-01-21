@@ -74,6 +74,10 @@ Proto: "./proto-name.proto"
 Method: "serviceName.methodName"
 ```
 
+- Monitor at dashboard locust
+
+<img src="images/dashboard-example.png" alt="logo" width="800"/>
+
 ## Example
 
 Read the [example](example/README.md)
