@@ -22,7 +22,6 @@ func Run(config *configs.CannonConfig) {
 		logrus.Info("Shutting Down Cannon....")
 		service.Stop(config)
 		stop <- true
-		logrus.Info("Bye!")
 		os.Exit(1)
 	}()
 	GetMetric(config, stop)

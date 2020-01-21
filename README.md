@@ -6,7 +6,7 @@
 
 ## Introduction
 
-ZaloPay Cannon is a benchmark system for ZaloPay's internal service. The aim is to build a multi-tennant system which provides intuitive UI/UX for users to submit tasks and perform benchmark.  
+ZaloPay Cannon is a benchmark system for ZaloPay's internal services. The aim is to build a multi-tenant system which provides intuitive UI/UX for users to submit tasks and perform benchmark.  
 
 ## Architecture
 
@@ -36,14 +36,17 @@ Usage:
   cannon run [flags]
 
 Flags:
-  -c, --config string   Config file (default "")
-      --host string     Config target host (default "localhost")
-      --port int        Config gRPC port (default 5557)
-  -p, --proto string    Proto File (default "./ping.proto")
-  -m, --method string   Method name (default "ping.PingService.ping")
-  -r, --hatchRate int    config Hatch rate (users spawned/second) (default 10)
-  -w, --no-workers int   Number of workers to simulate (default 800)
-  -h, --help            help for run
+  -c, --config string        path of config file
+  -r, --hatchRate int        config hatch rate (users spawned/second) (default 10)
+  -h, --help                 help for run
+  -H, --host string          target gRPC host (default "localhost")
+      --locust-host string   host of locust master (default "localhost")
+      --locust-port int      port of locust master (default 5557)
+      --locust-web string    locust web target (default "http://localhost:8089")
+  -m, --method string        method name
+  -w, --no-workers int       number of workers to simulate (default 10)
+  -P, --port int             target gRPC port (default 8000)
+  -p, --proto string         path of proto file
 
 ```
 
@@ -71,6 +74,11 @@ Proto: "./proto-name.proto"
 Method: "serviceName.methodName"
 ```
 
+- You can start `multiple instances of cannon` to benchmark in `distributed mode`.
+- Monitor at dashboard locust
+
+<img src="images/dashboard-example.png" alt="logo" width="800"/>
+
 ## Example
 
 Read the [example](example/README.md)
@@ -82,4 +90,4 @@ Read the [roadmap](docs/ROADMAP.md)
 ## Acknowledgements
 
 - Thanks to @anhld2, which served as an inspiration and guide in building this project.
-- Special thanks to @thinhda, @tranndc and @quyenpt for their work on making component-based theming a reality.
+- Special thanks to @thinhda, @tranndc and @quyenpt3 for their work on making component-based theming a reality.
