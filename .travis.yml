@@ -16,7 +16,9 @@ jobs:
       script: go build ./cmd/cannon
     - stage: test
       script: echo "Test 01"
+    -
       script: echo "Test 02"
     - stage: push-docker-registry
-      script: docker build -t registry-gitlab.zalopay.vn/ci-cd/cannon .
-      script: docker push registry-gitlab.zalopay.vn/ci-cd/cannon
+      script:
+        - docker build -t registry-gitlab.zalopay.vn/ci-cd/cannon .
+        - docker push registry-gitlab.zalopay.vn/ci-cd/cannon
