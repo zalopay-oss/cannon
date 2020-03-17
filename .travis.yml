@@ -3,8 +3,17 @@ language: go
 go:
   - 1.13.6
 
+branches:
+  only:
+  - feature/Integrate-TravisCI  
+
 before_script:
   - cd src
 
-script:
-  - go build ./cmd/cannon
+jobs:
+  include:
+    - stage: build
+      script: go build ./cmd/cannon
+    - stage: test
+      script: echo "Test 01"
+      script: echo "Test 02"
