@@ -13,7 +13,7 @@ before_script:
 jobs:
   include:
     - stage: build
-      script: go build ./cmd/cannon
+        script: go build ./cmd/cannon
     - stage: test
-      script: echo "Test 01"
-      script: echo "Test 02"
+        script: echo "Test 01"
+        script: echo "Test 02"
