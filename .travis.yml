@@ -13,10 +13,10 @@ before_script:
 jobs:
   include:
     - stage: build
-      - script: go build ./cmd/cannon
+      script: go build ./cmd/cannon
     - stage: test
-      - script: echo "Test 01"
-      - script: echo "Test 02"
+      script: echo "Test 01"
+      script: echo "Test 02"
     - deploy: push-docker-registry
-      - script: docker build -t registry-gitlab.zalopay.vn/ci-cd/cannon .
-      - script: docker push registry-gitlab.zalopay.vn/ci-cd/cannon
+      script: docker build -t registry-gitlab.zalopay.vn/ci-cd/cannon .
+      script: docker push registry-gitlab.zalopay.vn/ci-cd/cannon
