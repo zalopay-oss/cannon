@@ -20,6 +20,7 @@ jobs:
       script: echo "Test 02"
     - stage: push-docker-registry
       script:
+        - docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
         - docker build -t zpx-cannon .
         - docker tag zpx-cannon $DOCKER_USER/zpx-cannon:latest
         - docker push $DOCKER_USER/zpx-cannon:latest
